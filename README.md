@@ -24,6 +24,12 @@ classDiagram
     Flight <|-- DepartureFlight
 
 
+    Hotel o-- Room : 1..many
+    Room o-- Person : 1..many
+    Room o-- Bed : 1..many
+    Bed <|-- SingleBed
+    Bed <|-- DoubleBed
+    
     class Trip {
         +String overview
         +Time start
@@ -73,15 +79,25 @@ classDiagram
         +Int Duration
         +String Location
         +String Name
-        +Double Price
         +Int Travellers
-        +List~Person~ people
+        +List~Room~ Rooms
 
+        +Void AddPerson(RoomId, Person)
+    }
+    
+    
+    class Room {
+        +Double Price
+        +List~Person~
+        +String id
+        +Int Capacity
+        +AddPerson(Person)
+        +RemovePerson(Name)
         +Double PricePerDay()
         +Double PricePerPerson()
         +Double PricePerPersonPerDay()
-        +Void AddPerson(Person)
     }
+
 
     class Transport {
         String Info
@@ -104,7 +120,6 @@ classDiagram
     class DepartureFlight {
         +Time DepartureTime        
     }
-    Hotel o-- Person : 1..many
     class Person {
         +String Name
         +Bool prefSingle
