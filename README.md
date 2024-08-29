@@ -22,20 +22,27 @@ classDiagram
     Transport <|-- Flight
     Flight <|-- ArrivalFlight
     Flight <|-- DepartureFlight
-
+    TripInfo <|-- Trip
+    TripInfo <|-- TripSegments
 
     Hotel o-- Room : 1..many
     Room o-- Person : 1..many
     Room o-- Bed : 1..many
     Bed <|-- SingleBed
     Bed <|-- DoubleBed
-    
+    class TripInfo {
+        +String overview
+        +Time start
+        +Time end
+        +List~person~ travellers
+    }
+
     class Trip {
         +String overview
         +Time start
         +Time end
         +List~TripSegments~ splits
-
+        +List~Person~ travelers 
         +Double calcCostPP()
 
     }

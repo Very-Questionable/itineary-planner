@@ -1,32 +1,33 @@
+import HotelInfo from "./HotelInfo"
 import Person from "./Person"
 import Room from "./Room"
 
-export default class Hotel {
-  checkIn: Date
-  checkOut: Date
-  location: String
-  price: Number
+export default class Hotel extends HotelInfo {
+  wellformed(): boolean {
+    throw new Error("Method not implemented.")
+  }
+  location: string
   rooms: Array<Room>
 
-  constructor(checkIn:Date, checkOut:Date, location:String, rooms:Array<Room>) {
-    this.checkIn = checkIn;
-    this.checkOut = checkOut;
+  constructor(id:string, info: string, checkIn:Date, checkOut:Date, location:string, rooms?:Array<Room>) {
+    super(id, info, checkIn, checkOut);
+
     this.location = location;
-    this.rooms = rooms;
+    this.rooms = rooms ? rooms! : [];
   }
 
   /**
    * AddRoom
    */
-  public AddRoom(newRoom:Room) {
-    this.rooms.push(newRoom);
+  public AddRoom(room:Room) {
+    this.rooms.push(room);
   } 
 
   /**
    * AddPerson
    */
-  public AddPerson(roomId:String, person:Person) {
-    let target:Room|undefined = this.rooms.find(room => room.id === roomId);
+  public AddPerson(roomId:string, person:Person) {
+    const target:Room|undefined = this.rooms.find(room => room.id === roomId);
     if (!target) {
       throw new Error("Room does not exist");
     }

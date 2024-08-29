@@ -1,56 +1,73 @@
+import HotelInfo from "./HotelInfo";
 import Person from "./Person";
 
-export default class Room {
-    id: string
-	price: number
+export default class Room extends HotelInfo {
+
+    price: number
 	persons: Array<Person>
     capacity: number
     
-
+    
     // Partially Filled room
-    constructor (roomId:string, price:number, capacity:number, persons?:Array<Person>) {
+    constructor (id:string, info:string, checkIn: Date, checkOut: Date, price:number, capacity:number, persons?:Array<Person>) {
+        super(id,info,checkIn,checkOut);
         this.price = price;
         this.capacity = capacity;
         this.persons = persons ? persons! : [];
-        this.id = roomId;
     }
-
+    
 	
 	/**
      * addPerson
-     */
-    public addPerson(newPerson:Person) {
-        if (this.persons.length + 1 > this.capacity) {
-            throw new Error("Capacity for this room has been reach");
+    */
+   public addPerson(newPerson:Person) {
+       if (this.persons.length + 1 > this.capacity) {
+           throw new Error("Capacity for this room has been reach");
         }
-
+        
         this.persons.push(newPerson);
     }
-
+    
     /**
      * removePerson
-     */
-    public removePerson(personId: String) {
-        if (!this.persons.some(person => personId === person.id)) {
-            throw new Error("Invalid person Id, cannot find person");
+    */
+   public removePerson(personId: string): Person {
+        const target: Person|undefined = this.persons.find(person => personId === person.id)   
+        if (!target) {
+           throw new Error("Invalid person Id, cannot find person");
         }
-
+        
         this.persons = this.persons.filter((person) => personId !== person.id);
+        return target!;
     }
-
+    
     /**
      * updateCapacity
-     */
-    public updateCapacity(newPrice: number, newCapacity: number) {
-        this.price = newPrice;
-        this.capacity = newCapacity;
+    */
+   public updateCapacity(newPrice: number, newCapacity: number) {
+       this.price = newPrice;
+       this.capacity = newCapacity;
+    }
+    
+    /**
+     * pricePP
+    */
+   public pricePP() {
+       return this.price / this.capacity 
+    }
+    
+    /**
+     * pricePPperDay
+    */
+   public pricePPperDay() {
+       return this.price / (this.capacity * this.duration()) 
     }
 
     /**
-     * pricePP
+     * Wellformed if at capacity
      */
-    public pricePP() {
-       return this.price / this.capacity 
+    wellformed(): boolean {
+        return this.persons.length === this.capacity
     }
 
 }

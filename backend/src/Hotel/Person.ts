@@ -3,5 +3,5 @@ export default interface Person {
     name: string
     prefSingle?: boolean
     requireSingle?: boolean
-    data?: any
+    data?: object
 }
