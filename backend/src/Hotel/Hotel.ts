@@ -17,7 +17,7 @@ export default class Hotel extends HotelInfo {
    * AddRoom
   */
   public addRoom(room:Room) {
-    if (this.rooms.some(r => r.id === room.id)) throw new Error("Room Id in use");
+    if (this.containsRoom(room.id)) throw new Error("Room Id in use");
     this.rooms.push(room);
   } 
   
@@ -26,7 +26,7 @@ export default class Hotel extends HotelInfo {
    * @param roomId - id of room
   */
   removeRoom(roomId: string): Room {
-    const target: Room | undefined = this.rooms.find(room => room.id === roomId);
+    const target = this.rooms.find(room => room.id === roomId);
     if (!target) throw new Error("Room does not exist");
    
     this.rooms = this.rooms.filter(room => room.id !== roomId);
@@ -36,7 +36,7 @@ export default class Hotel extends HotelInfo {
    * addPerson
   */
   public addPerson(roomId:string, person:Person) {
-    const target:Room|undefined = this.rooms.find(room => room.id === roomId);
+    const target = this.rooms.find(room => room.id === roomId);
     if (!target) {
       throw new Error("Room does not exist");
     }
@@ -44,18 +44,28 @@ export default class Hotel extends HotelInfo {
     target.addPerson(person);
   }
   
-  removePerson(roomId: string, personId: string): Person {
-    const target: Room | undefined = this.rooms.find(room => room.id === roomId);
+  public removePerson(roomId: string, personId: string): Person {
+    const target = this.rooms.find(room => room.id === roomId);
     if (!target) throw new Error("Room does not exist");
     
     return target.removePerson(personId);
   }
+
+  public containsPerson(id:string): boolean {
+    return this.rooms.some(room => room.containsPerson(id));
+  }
+
+  public containsRoom(id:string): boolean {
+    return this.rooms.some(room => room.id === id);
+  }
+
   /**
    * Clears all rooms
   */
   public clear(): void {
     this.rooms = [];
   }
+  
   /**
    * In a hotel
    *  - CheckIn and CheckOut Days must match
@@ -76,10 +86,10 @@ export default class Hotel extends HotelInfo {
 
     return this.rooms.length > 0 &&
           allRooms.length === nubbedRooms.size &&
-           allPeople.length === nubbedPeople.size && 
-           this.rooms.every(room => room.wellformed() &&
-                room.checkIn.getDate() === this.checkIn.getDate() &&
-                room.checkOut.getDate() === this.checkOut.getDate()
-              );
+          allPeople.length === nubbedPeople.size && 
+          this.rooms.every(room => room.wellformed() &&
+              room.checkIn.getDate() === this.checkIn.getDate() &&
+              room.checkOut.getDate() === this.checkOut.getDate()
+            );
   }
 }

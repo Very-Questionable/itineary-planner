@@ -1,11 +1,13 @@
 import Info from "../Info";
 
-export default class Day extends Info {
-    wellformed(): boolean {
-        throw new Error("Method not implemented.");
-    }
+export default abstract class Day extends Info {
+    abstract wellformed(): boolean
     
-    constructor (id: string, info: string) {
+    date: Date
+    
+    constructor (id: string, info: string, date:Date) {
         super(id, info);
+        this.date = date;
     }
+
 }

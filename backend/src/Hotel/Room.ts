@@ -7,7 +7,6 @@ export default class Room extends HotelInfo {
   persons: Array<Person>
   capacity: number
   
-  
   // Partially Filled room
   constructor (id:string, info:string, checkIn: Date, checkOut: Date, price:number, capacity:number, persons?:Array<Person>) {
     super(id,info,checkIn,checkOut);
@@ -40,6 +39,15 @@ export default class Room extends HotelInfo {
     
     this.persons = this.persons.filter((person) => personId !== person.id);
     return target!;
+  }
+  
+  /**
+   * 
+   * @param id 
+   * @returns if the room contains a person with the required id
+   */
+  public containsPerson(id:string): boolean {
+    return this.persons.some(person => person.id === id);
   }
   
   /**
