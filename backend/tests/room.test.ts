@@ -13,6 +13,7 @@ describe("Room Tests", () => {
     const expected = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1,[{id: "john1", name:"john beans"}]);
     const room = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1);
     room.addPerson({id: "john1", name:"john beans"});
+    expect(() => room.addPerson({id: "john1", name:"john beans"})).toThrow();
     expect(expected.persons).toStrictEqual(room.persons);
     expect(() => room.addPerson({id: "john2", name:"john beans2"})).toThrow();
   });
