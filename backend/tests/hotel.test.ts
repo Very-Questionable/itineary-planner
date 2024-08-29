@@ -12,6 +12,7 @@ describe("Hotel Tests", () => {
     expect(myHotel).toBeDefined();
 
   });
+
   test("Test Add Person", () => {
     const myPerson: Person = {id:"John1",name:"John"}
     const singleRoom = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1,[myPerson]);
@@ -29,6 +30,7 @@ describe("Hotel Tests", () => {
     expect(myEmptyHotel).toStrictEqual(myHotel);
     
   });
+
   test("Test Remove Person", () => {
     const myPerson: Person = {id:"John1",name:"John"}
     const singleRoom = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1,[myPerson]);
@@ -60,5 +62,27 @@ describe("Hotel Tests", () => {
     expect(() => myHotel.removeRoom("0")).toThrow();
     expect(myHotel.removeRoom("1")).toStrictEqual(singleRoom);
     expect(myEmptyHotel).toStrictEqual(myHotel);
+  });
+
+  test("Wellformed", () => {
+    const myPerson1: Person = {id:"1",name:"John1"}
+    const myPerson2: Person = {id:"2",name:"John2"}
+
+    const singleRoom = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1,[myPerson1]);
+    const singleRoom2 = new Room("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1, [myPerson2]);
+    const singleRoom3 = new Room("2","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")), 230, 1, [myPerson2]);
+    
+    const myEmptyHotel = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[]);
+    const myHotel = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom]);
+    
+    const doubleBooked = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom, singleRoom]);
+    const reusedRoom = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom, singleRoom2]);
+    const validBooked = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom, singleRoom3]);
+    
+    expect(myEmptyHotel.wellformed()).toBeFalsy();
+    expect(myHotel.wellformed()).toBeTruthy();
+    expect(doubleBooked.wellformed()).toBeFalsy();
+    expect(reusedRoom.wellformed()).toBeFalsy ();
+    expect(validBooked.wellformed()).toBeTruthy ();
   });
 });

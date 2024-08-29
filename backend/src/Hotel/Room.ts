@@ -75,7 +75,7 @@ export default class Room extends HotelInfo {
    * Wellformed if at capacity
    */
   wellformed(): boolean {
-    return this.persons.length === this.capacity
+    return this.persons.length === this.capacity && this.capacity > 0;
   }
 
 }
