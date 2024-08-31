@@ -8,9 +8,15 @@ describe("TripSegment Hotel Integration", () => {
     expect(temp).toBeDefined();
     
   })
+  
+  test("Wellformed", () => {
+
+  });
 });
 
 
 describe("TripSegment Activities Integration", () => {
+  test("Wellformed", () => {
 
+  });
 });
