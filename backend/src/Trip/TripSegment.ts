@@ -103,6 +103,7 @@ export default class TripSegment extends TripInfo {
    *  - Hotel start and end dates match Trip segment start and end dates
    *  - Days Matches duration
    *  - Days are all wellformed and in sorted order
+   *  - There are no skipped days
    */
   wellformed(): boolean {
     throw new Error("Method not implemented.");

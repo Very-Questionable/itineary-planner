@@ -4,6 +4,7 @@ import TripSegment from "./TripSegment";
 
 export default class Trip extends TripInfo {
     splits: Array<TripSegment>
+    
     constructor(id: string, info: string, start: Date, end: Date, travellers?: Array<Person>, splits?: Array<TripSegment>) {
         super(id,info,start,end, travellers);
         this.splits = splits ? splits! : [];
