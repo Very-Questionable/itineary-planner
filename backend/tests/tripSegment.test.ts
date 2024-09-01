@@ -15,7 +15,6 @@ const roomUnassigned = new Room("2","myRoom", startdate, enddate, 230, 1);
 const myHotel = new Hotel("1","myRoom", startdate, enddate,"Here",[singleRoom]);
 const myHotelUnassigned = new Hotel("1","myRoom", startdate, enddate,"Here",[roomUnassigned]);
 
-const validBooked = new Hotel("1","myRoom", startdate, enddate,"Here",[singleRoom, singleRoom3]);
     
 describe("TripSegment Hotel Integration", () => {
   test("compiles", () => {
@@ -44,7 +43,7 @@ describe("TripSegment Hotel Integration", () => {
 
     expect(testSegment.removeHotel(myHotel.id)).toStrictEqual(myHotel);
     expect(() => testSegment.removeHotel(myHotel.id)).toThrow();
-    expect(testSegment.removeHotel).toStrictEqual([]);
+    expect(testSegment.containsHotel(myHotel.id)).toBeFalsy();
     
   });
 
@@ -91,5 +90,5 @@ describe("TripSegment Activities Integration", () => {
 });
 
 describe("TripSegment Wellformed", () => {
-  
+
 })
