@@ -2,8 +2,8 @@ import Person from "../Hotel/Person";
 import Info from "../Info";
 
 export default abstract class TripInfo extends Info {
-  start: Date;
-  end: Date;
+  private end: Date;
+  private start: Date;
   travellers: Array<Person>;
   constructor(
     id: string,
@@ -29,18 +29,6 @@ export default abstract class TripInfo extends Info {
   }
 
   /**
-   *
-   * @param id Person Id to remove
-   */
-  public removeTraveller(id: string): Person {
-    const target = this.getTraveller(id);
-    if (!target) throw new Error("Traveller does not exist");
-    this.travellers = this.travellers.filter((person) => person.id !== id);
-
-    return target;
-  }
-
-  /**
    * Util function: Contains traveller: checks if a person is in a trip
    * @param id: person ID
    * @returns 
@@ -56,5 +44,17 @@ export default abstract class TripInfo extends Info {
    */
   public getTraveller(id: string): Person | undefined {
     return this.travellers.find((traveller) => traveller.id === id);
+  }
+
+  /**
+   *
+   * @param id Person Id to remove
+   */
+  public removeTraveller(id: string): Person {
+    const target = this.getTraveller(id);
+    if (!target) throw new Error("Traveller does not exist");
+    this.travellers = this.travellers.filter((person) => person.id !== id);
+
+    return target;
   }
 }

@@ -3,8 +3,8 @@ import Person from "./Person";
 import Room from "./Room";
 
 export default class Hotel extends HotelInfo {
-  location: string;
-  rooms: Array<Room>;
+  private location: string;
+  private rooms: Array<Room>;
 
   constructor(
     id: string,
@@ -21,25 +21,6 @@ export default class Hotel extends HotelInfo {
   }
 
   /**
-   * AddRoom
-   */
-  public addRoom(room: Room) {
-    if (this.containsRoom(room.id)) throw new Error("Room Id in use");
-    this.rooms.push(room);
-  }
-
-  /**
-   *
-   * @param roomId - id of room
-   */
-  removeRoom(roomId: string): Room {
-    const target = this.getRoom(roomId);
-    if (!target) throw new Error("Room does not exist");
-
-    this.rooms = this.rooms.filter((room) => room.id !== roomId);
-    return target;
-  }
-  /**
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
@@ -51,11 +32,19 @@ export default class Hotel extends HotelInfo {
     target.addPerson(person);
   }
 
-  public removePerson(roomId: string, personId: string): Person {
-    const target = this.getRoom(roomId);
-    if (!target) throw new Error("Room does not exist");
+  /**
+   * AddRoom
+   */
+  public addRoom(room: Room) {
+    if (this.containsRoom(room.id)) throw new Error("Room Id in use");
+    this.rooms.push(room);
+  }
 
-    return target.removePerson(personId);
+  /**
+   * Clears all rooms
+   */
+  public clear(): void {
+    this.rooms = [];
   }
 
   public containsPerson(id: string): boolean {
@@ -70,11 +59,23 @@ export default class Hotel extends HotelInfo {
     return this.rooms.find((room) => room.id === id);
   }
 
+  public removePerson(roomId: string, personId: string): Person {
+    const target = this.getRoom(roomId);
+    if (!target) throw new Error("Room does not exist");
+
+    return target.removePerson(personId);
+  }
+
   /**
-   * Clears all rooms
+   *
+   * @param roomId - id of room
    */
-  public clear(): void {
-    this.rooms = [];
+  removeRoom(roomId: string): Room {
+    const target = this.getRoom(roomId);
+    if (!target) throw new Error("Room does not exist");
+
+    this.rooms = this.rooms.filter((room) => room.id !== roomId);
+    return target;
   }
 
   /**

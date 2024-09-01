@@ -2,11 +2,9 @@ import HotelInfo from "./HotelInfo";
 import Person from "./Person";
 
 export default class Room extends HotelInfo {
-  
-  price: number
+  private capacity: number
   persons: Array<Person>
-  capacity: number
-  
+  price: number
   // Partially Filled room
   constructor (id:string, info:string, checkIn: Date, checkOut: Date, price:number, capacity:number, persons?:Array<Person>) {
     super(id,info,checkIn,checkOut);

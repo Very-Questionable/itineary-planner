@@ -1,7 +1,6 @@
 export default abstract class Info {
+    private info: string
     id: string
-    info: string
-
     constructor (id:string, info:string) {
         this.id = id;
         this.info = info;

@@ -14,14 +14,14 @@ export default class Day extends Info {
     this.itinearies = itinearies ? itinearies : [];
   }
 
-  public containsItineary(id: string): boolean {
-    return this.itinearies.some((itineary) => itineary.id === id);
-  }
-
   public addItineary(itineary: Itineary) {
     if (this.containsItineary(itineary.id))
       throw new Error("Itineary already added");
     this.itinearies.push(itineary);
+  }
+
+  public containsItineary(id: string): boolean {
+    return this.itinearies.some((itineary) => itineary.id === id);
   }
 
   public removeItineary(id: string): Itineary {
