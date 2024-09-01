@@ -2,6 +2,9 @@ import HotelInfo from "./HotelInfo";
 import Person from "./Person";
 
 export default class Room extends HotelInfo {
+  getPerson(id: string): Person|undefined {
+    throw new Error("Method not implemented.");
+  }
 
   price: number
   persons: Array<Person>

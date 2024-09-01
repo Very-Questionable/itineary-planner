@@ -4,6 +4,9 @@ import Person from "../Hotel/Person";
 import TripInfo from "./TripInfo";
 
 export default class TripSegment extends TripInfo {
+  getHotel(id: string): Hotel|undefined {
+    throw new Error("Method not implemented.");
+  }
   
   hotels: Array<Hotel>;
   days: Array<Day>;
@@ -35,7 +38,7 @@ export default class TripSegment extends TripInfo {
     const target = this.travellers.find(person => person.id === id);
     if (!target) throw new Error ("Traveller does not exist");
     this.travellers = this.travellers.filter(person => person.id !== id);
-    
+
     return target;
   }
 
@@ -71,22 +74,19 @@ export default class TripSegment extends TripInfo {
     return target;
   }
 
-  public addPerson(hotelId: string, roomId:string, traveler: Person) {
+  public assignRoom(hotelId: string, roomId:string, travelerId: string) {
+    const targetTraveller = this.travellers.find((traveler) => traveler.id === travelerId);
     const targetHotel = this.hotels.find(hotel => hotel.id === hotelId);
+    if (!targetTraveller) throw new Error ("Traveller does not exist");
     if (!targetHotel) throw new Error ("Hotel does not exist");
     if (!targetHotel.containsRoom(roomId)) throw new Error("Room does not exist");
-    if (this.hotels.some(hotel => hotel.containsPerson(traveler.id)))
+    if (this.hotels.some(hotel => hotel.containsPerson(travelerId)))
       throw new Error("Traveller already has a room");
 
-    targetHotel.addPerson(roomId, traveler);
-    if (!this.travellers.some(person => person.id == traveler.id)) {
-      this.addTraveller(traveler);
-    }
-
-
+    targetHotel.addPerson(roomId, targetTraveller);
   }
 
-  public removePerson(hotelId: string, roomId:string, personId: string): Person {
+  public unassignRoom(hotelId: string, roomId:string, personId: string): Person {
     const targetHotel = this.hotels.find(hotel => hotel.id === hotelId);
     if (!targetHotel) throw new Error ("Hotel does not exist");
     if (!targetHotel.containsRoom(roomId)) throw new Error("Room does not exist");

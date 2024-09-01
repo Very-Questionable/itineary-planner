@@ -3,6 +3,9 @@ import Person from "./Person"
 import Room from "./Room"
 
 export default class Hotel extends HotelInfo {
+  getRoom(id: string): Room | undefined {
+    throw new Error("Method not implemented.")
+  }
   location: string
   rooms: Array<Room>
   
