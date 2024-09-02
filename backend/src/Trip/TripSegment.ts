@@ -23,6 +23,10 @@ export default class TripSegment extends TripInfo {
       : [];
   }
 
+  private containsDate(date: Date): boolean {
+    return this.days.some((day) => day.date === date);
+  }
+  
   public containsDay(id: string): boolean {
     return this.days.some((day) => day.id === id);
   }
@@ -35,6 +39,7 @@ export default class TripSegment extends TripInfo {
     if (day.date < this.start) throw new Error("Date before split start");
     if (day.date >= this.end) throw new Error("Date after split end");
     if (this.containsDay(day.id)) throw new Error("Day already added");
+    if (this.containsDate(day.date)) throw new Error("Day already added");
     this.days.push(day);
     this.days.sort((a, b) => a.date.getTime() - b.date.getTime());
   }

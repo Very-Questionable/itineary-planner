@@ -10,10 +10,11 @@ export default abstract class TripInfo extends Info {
     info: string,
     start: Date,
     end: Date,
-    travelers?: Array<Person>
+    travelers?: Array<Person>,
+    metadata?: object
   ) {
     if (start > end) throw new Error("Start date after end Date");
-    super(id, info);
+    super(id, info, metadata);
     this.start = start;
     this.end = end;
     this.travellers = travelers ? travelers! : [];
@@ -31,7 +32,7 @@ export default abstract class TripInfo extends Info {
   /**
    * Util function: Contains traveller: checks if a person is in a trip
    * @param id: person ID
-   * @returns 
+   * @returns
    */
   public containsTraveller(id: string): boolean {
     return this.travellers.some((traveller) => traveller.id === id);
@@ -40,7 +41,7 @@ export default abstract class TripInfo extends Info {
   /**
    * Util function: Attempts to get a traveller: checks if a person is in a trip
    * @param id: person ID
-   * @returns Maybe Person 
+   * @returns Maybe Person
    */
   public getTraveller(id: string): Person | undefined {
     return this.travellers.find((traveller) => traveller.id === id);
@@ -57,11 +58,14 @@ export default abstract class TripInfo extends Info {
 
     return target;
   }
-  
+
   /**
    * returns duration of stay in nights
    */
   public duration(): number {
-      return Math.floor(Math.abs(this.end.getTime() - this.start.getTime())/(1000 * 60 * 60 *24))
+    return Math.floor(
+      Math.abs(this.end.getTime() - this.start.getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
   }
 }
