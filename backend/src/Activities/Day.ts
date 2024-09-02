@@ -1,6 +1,7 @@
 import Info from "../Info";
 import Itineary from "./Itineary";
 export default class Day extends Info {
+  
   date: Date;
   itinearies: Array<Itineary>;
   constructor(
@@ -18,6 +19,10 @@ export default class Day extends Info {
     if (this.containsItineary(itineary.id))
       throw new Error("Itineary already added");
     this.itinearies.push(itineary);
+  }
+
+  public getItineary(id: string): Itineary | undefined {
+    return this.itinearies.find(it => it.id === id);
   }
 
   public containsItineary(id: string): boolean {

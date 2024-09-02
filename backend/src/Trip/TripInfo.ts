@@ -2,8 +2,8 @@ import Person from "../Hotel/Person";
 import Info from "../Info";
 
 export default abstract class TripInfo extends Info {
-  private end: Date;
-  private start: Date;
+  end: Date;
+  start: Date;
   travellers: Array<Person>;
   constructor(
     id: string,
@@ -56,5 +56,12 @@ export default abstract class TripInfo extends Info {
     this.travellers = this.travellers.filter((person) => person.id !== id);
 
     return target;
+  }
+  
+  /**
+   * returns duration of stay in nights
+   */
+  public duration(): number {
+      return Math.floor(Math.abs(this.end.getTime() - this.start.getTime())/(1000 * 60 * 60 *24))
   }
 }

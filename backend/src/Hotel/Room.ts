@@ -2,7 +2,7 @@ import HotelInfo from "./HotelInfo";
 import Person from "./Person";
 
 export default class Room extends HotelInfo {
-  private capacity: number
+  capacity: number
   persons: Array<Person>
   price: number
   // Partially Filled room

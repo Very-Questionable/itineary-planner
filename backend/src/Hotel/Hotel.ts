@@ -3,8 +3,8 @@ import Person from "./Person";
 import Room from "./Room";
 
 export default class Hotel extends HotelInfo {
-  private location: string;
-  private rooms: Array<Room>;
+  location: string;
+  rooms: Array<Room>;
 
   constructor(
     id: string,
@@ -30,6 +30,10 @@ export default class Hotel extends HotelInfo {
     }
 
     target.addPerson(person);
+  }
+
+  public listPersons(): Array<Person> {
+    return this.rooms.flatMap(room => room.persons);
   }
 
   /**

@@ -3,7 +3,7 @@ import TripInfo from "./TripInfo";
 import TripSegment from "./TripSegment";
 
 export default class Trip extends TripInfo {
-    private splits: Array<TripSegment>
+    splits: Array<TripSegment>
     
     constructor(id: string, info: string, start: Date, end: Date, travellers?: Array<Person>, splits?: Array<TripSegment>) {
         super(id,info,start,end, travellers);
