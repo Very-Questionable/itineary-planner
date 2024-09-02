@@ -12,9 +12,10 @@ export default class Hotel extends HotelInfo {
     checkIn: Date,
     checkOut: Date,
     location: string,
-    rooms?: Array<Room>
+    rooms?: Array<Room>,
+    metadata?: object
   ) {
-    super(id, info, checkIn, checkOut);
+    super(id, info, checkIn, checkOut, metadata);
 
     this.location = location;
     this.rooms = rooms ? rooms! : [];
@@ -24,7 +25,7 @@ export default class Hotel extends HotelInfo {
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
-    const target = this.getRoom(roomId); 
+    const target = this.getRoom(roomId);
     if (!target) {
       throw new Error("Room does not exist");
     }
@@ -33,7 +34,7 @@ export default class Hotel extends HotelInfo {
   }
 
   public listPersons(): Array<Person> {
-    return this.rooms.flatMap(room => room.persons);
+    return this.rooms.flatMap((room) => room.persons);
   }
 
   /**

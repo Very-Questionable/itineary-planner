@@ -23,9 +23,9 @@ const myActivities: Activities = {
   afternoon: [myActivity2, myActivity3, myActivity4]
 }
 
-const myFreeItineary = new FreeDayItineary("1","Free day", "free day");
-const mySplitItineary = new SplitDayItineary("2","Split day", "Split day",myActivities);
-const myWholeItineary = new WholeDayItineary("3", "Whole day", "whole day", myActivity)
+const myFreeItineary = new FreeDayItineary("1","Free day");
+const mySplitItineary = new SplitDayItineary("2","Split day",myActivities);
+const myWholeItineary = new WholeDayItineary("3", "Whole day", myActivity)
 describe("Day tests", () => {
   test("Compiles",() => {
     // const validBooked = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom, singleRoom3]);
