@@ -2,11 +2,9 @@ import HotelInfo from "./HotelInfo";
 import Person from "./Person";
 
 export default class Room extends HotelInfo {
-
-  price: number
-  persons: Array<Person>
   capacity: number
-  
+  persons: Array<Person>
+  price: number
   // Partially Filled room
   constructor (id:string, info:string, checkIn: Date, checkOut: Date, price:number, capacity:number, persons?:Array<Person>) {
     super(id,info,checkIn,checkOut);
@@ -19,10 +17,10 @@ export default class Room extends HotelInfo {
   /**
    * addPerson
   */
-   public addPerson(newPerson:Person) {
-    if (this.persons.some(person => person.id === newPerson.id)) throw new Error("Person id in use");
-    if (this.persons.length + 1 > this.capacity) {
-      throw new Error("Capacity for this room has been reach");
+ public addPerson(newPerson:Person) {
+   if (this.containsPerson(newPerson.id)) throw new Error("Person id in use");
+   if (this.persons.length + 1 > this.capacity) {
+     throw new Error("Capacity for this room has been reach");
     }
     
     this.persons.push(newPerson);
@@ -31,10 +29,10 @@ export default class Room extends HotelInfo {
   /**
    * removePerson
   */
-   public removePerson(personId: string): Person {
-    const target: Person|undefined = this.persons.find(person => personId === person.id)   
-    if (!target) {
-      throw new Error("Invalid person Id, cannot find person");
+ public removePerson(personId: string): Person {
+   const target = this.getPerson(personId); 
+   if (!target) {
+     throw new Error("Invalid person Id, cannot find person");
     }
     
     this.persons = this.persons.filter((person) => personId !== person.id);
@@ -45,45 +43,54 @@ export default class Room extends HotelInfo {
    * 
    * @param id 
    * @returns if the room contains a person with the required id
-   */
+  */
   public containsPerson(id:string): boolean {
-    return this.persons.some(person => person.id === id);
+   return this.persons.some(person => person.id === id);
+  }
+
+  /**
+   * 
+   * @param id person id
+   * @returns maybe person info
+   */
+  public getPerson(id: string): Person|undefined {
+    return this.persons.find(person => person.id === id);
   }
   
   /**
    * Clear: Clears all persons
-   */
-  public clear(): void {
-    this.persons = [];
+  */
+ public clear(): void {
+   this.persons = [];
   }
-
+  
   /**
    * updateCapacity
   */
-  public updateCapacity(newPrice: number, newCapacity: number) {
-     this.price = newPrice;
-     this.capacity = newCapacity;
+ public updateCapacity(newPrice: number, newCapacity: number) {
+   this.price = newPrice;
+   this.capacity = newCapacity;
   }
   
   /**
    * pricePP
   */
-   public pricePP() {
-     return this.price / this.capacity 
+ public pricePP() {
+   return this.price / this.capacity 
   }
   
   /**
    * pricePPperDay
   */
-   public pricePPperDay() {
-     return this.price / (this.capacity * this.duration()) 
+ public pricePPperDay() {
+   return this.price / (this.capacity * this.duration()) 
   }
-
+  
   /**
    * Wellformed if at capacity
-   */
-  wellformed(): boolean {
-    return this.persons.length === this.capacity && this.capacity > 0;
+  */
+ wellformed(): boolean {
+   return this.persons.length === this.capacity && this.capacity > 0;
   }
-
+  
 }

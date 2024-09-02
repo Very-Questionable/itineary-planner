@@ -6,12 +6,14 @@ export default class FreeDayItineary extends Itineary {
     super(id, info, name, images);
   }
 
-  listActivities(): Array<Activity> {
-    return [];
-  }
   isFreeDay(): boolean {
     return true;
   }
+
+  listActivities(): Array<Activity> {
+    return [];
+  }
+
   wellformed(): boolean {
     return true;
   }

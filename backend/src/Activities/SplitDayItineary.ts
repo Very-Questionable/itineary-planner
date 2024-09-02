@@ -2,9 +2,9 @@ import Activity, { Activities } from "./Activity";
 import Itineary from "./Itineary";
 
 export default class SplitDayItineary extends Itineary {
-  morning: Array<Activity>;
-  afternoon: Array<Activity>;
-  night: Array<Activity>;
+  private afternoon: Array<Activity>;
+  private morning: Array<Activity>;
+  private night: Array<Activity>;
   
   constructor (id: string, info: string, name: string, activities: Activities ,images?: Array<string>,
   ) {
@@ -13,13 +13,15 @@ export default class SplitDayItineary extends Itineary {
     this.afternoon = activities.afternoon ? activities.afternoon : [];
     this.night = activities.night ? activities.night : [];
   }
-  
-  listActivities(): Array<Activity> {
-    return this.morning.concat(this.afternoon).concat(this.night)
-  }
+
   isFreeDay(): boolean {
     return false;
   }
+
+  listActivities(): Array<Activity> {
+    return this.morning.concat(this.afternoon).concat(this.night)
+  }
+
   wellformed(): boolean {
     return this.morning.concat(this.afternoon).concat(this.night).length > 0;
   }
