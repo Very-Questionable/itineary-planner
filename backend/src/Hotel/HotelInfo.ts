@@ -4,8 +4,8 @@ export default abstract class HotelInfo extends Info {
     checkIn: Date
     checkOut: Date
 
-    constructor(id: string, info: string, checkIn: Date, checkOut: Date) {
-        super(id,info);
+    constructor(id: string, info: string, checkIn: Date, checkOut: Date, metadata?: object) {
+        super(id,info,metadata);
         this.checkIn = checkIn;
         this.checkOut = checkOut;
     }

@@ -29,20 +29,31 @@ const myHotelUnassigned = new Hotel("1", "myRoom", startdate, enddate, "Here", [
   roomUnassigned,
 ]);
 
-const activity: Activity = {id: "1", name: "name", info: "hello", location: "here"}
+const activity: Activity = {
+  id: "1",
+  name: "name",
+  info: "hello",
+  location: "here",
+};
 const activities: Activities = {
-  morning: [{id: "2", name: "name", info: "hello", location: "here"}, {id: "3", name: "name", info: "hello", location: "here"}, {id: "4", name: "name", info: "hello", location: "here"}],
-  night: [{id: "5", name: "name", info: "hello", location: "here"}, {id: "6", name: "name", info: "hello", location: "here"}]
-}
+  morning: [
+    { id: "2", name: "name", info: "hello", location: "here" },
+    { id: "3", name: "name", info: "hello", location: "here" },
+    { id: "4", name: "name", info: "hello", location: "here" },
+  ],
+  night: [
+    { id: "5", name: "name", info: "hello", location: "here" },
+    { id: "6", name: "name", info: "hello", location: "here" },
+  ],
+};
 
-const freeItineary = new FreeDayItineary("1", "1", "info");
-const wholeItineary = new WholeDayItineary("2", "2", "info", activity);
-const splitItineary = new SplitDayItineary("3", "3", "info", activities)
+const freeItineary = new FreeDayItineary("1", "1");
+const wholeItineary = new WholeDayItineary("2", "2", activity);
+const splitItineary = new SplitDayItineary("3", "3", activities);
 const day1 = new Day("1", "?", startdate, [freeItineary]);
 const day2 = new Day("2", "?", date2, [wholeItineary]);
 const day3 = new Day("3", "?", date3, [splitItineary]);
 const day4 = new Day("3", "?", enddate, [splitItineary]);
-
 
 describe("TripSegment Hotel Integration", () => {
   test("compiles", () => {
@@ -133,8 +144,8 @@ describe("TripSegment Hotel Integration", () => {
   });
 });
 
-const invalidBefore = new Day("1","2", beforeDate);
-const invalidAfter = new Day("1","2", afterDate);
+const invalidBefore = new Day("1", "2", beforeDate);
+const invalidAfter = new Day("1", "2", afterDate);
 
 describe("TripSegment Activities Integration", () => {
   test("Add/Remove Day", () => {
@@ -153,29 +164,47 @@ describe("TripSegment Activities Integration", () => {
   });
 
   test("Add/Remove Itineary", () => {
-    const testDay = new Day("1", "test day", date2)
+    const testDay = new Day("1", "test day", date2);
     testDay.addItineary(freeItineary);
     expect(testDay.getItineary(freeItineary.id)).toStrictEqual(freeItineary);
     expect(() => testDay.addItineary(freeItineary)).toThrow();
-    
+
     expect(() => testDay.removeItineary("0")).toThrow();
     expect(testDay.removeItineary(freeItineary.id)).toStrictEqual(freeItineary);
     expect(testDay.getItineary(freeItineary.id)).toBeUndefined();
   });
-
-
 });
 
 describe("TripSegment Wellformed", () => {
   test("wellformedness", () => {
-    const myDays = [day1,day2,day3]
-    const testSegment = new TripSegment("t", "t", startdate, enddate, [myPerson1], [myHotel], myDays);
+    const myDays = [day1, day3, day2, day4]; // order doesnt matter since it should sort
+    const testSegment = new TripSegment(
+      "t",
+      "t",
+      startdate,
+      enddate,
+      [myPerson1],
+      [myHotel],
+      myDays
+    );
     expect(testSegment.wellformed()).toBeTruthy();
+    // console.log(testSegment);
+    // console.log(JSON.stringify(testSegment));
   });
 
   test("Days wellformedness", () => {
-    const myDays = [day1,day2,day4]
-    const testSegment = new TripSegment("t", "t", startdate, enddate, [myPerson1], [myHotel], myDays);
+    const invalidDay3 = day3;
+    invalidDay3.id = "hello"
+    const myDays = [day1, day3, invalidDay3, day4];
+    const testSegment = new TripSegment(
+      "t",
+      "t",
+      startdate,
+      enddate,
+      [myPerson1],
+      [myHotel],
+      myDays
+    );
     expect(testSegment.wellformed()).toBeFalsy();
   });
 });

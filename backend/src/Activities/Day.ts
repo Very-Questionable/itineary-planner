@@ -8,9 +8,10 @@ export default class Day extends Info {
     id: string,
     info: string,
     date: Date,
-    itinearies?: Array<Itineary>
+    itinearies?: Array<Itineary>,
+    metadata?: object
   ) {
-    super(id, info);
+    super(id, info, metadata);
     this.date = date;
     this.itinearies = itinearies ? itinearies : [];
   }

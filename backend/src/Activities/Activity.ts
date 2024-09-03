@@ -9,6 +9,7 @@ export default interface Activity {
   info: string,
   location: string,
   images?: Array<string>,
+  metadata?: object
 }
 /**
  * Payload for activities
@@ -17,5 +18,6 @@ export interface Activities {
   morning?: Array<Activity>;
   afternoon?: Array<Activity>;
   night?: Array<Activity>;
+  metadata?: object
 }
 
