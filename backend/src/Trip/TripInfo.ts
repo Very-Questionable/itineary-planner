@@ -1,3 +1,4 @@
+import { InputError } from "../Error/error.js";
 import Person from "../Hotel/Person.js";
 import Info from "../Info.js";
 
@@ -13,7 +14,7 @@ export default abstract class TripInfo extends Info {
     travelers?: Array<Person>,
     metadata?: object
   ) {
-    if (start > end) throw new Error("Start date after end Date");
+    if (start > end) throw new InputError("Start date after End Date");
     super(id, info, metadata);
     this.start = start;
     this.end = end;

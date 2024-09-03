@@ -1,4 +1,5 @@
 import Day from "../Activities/Day.js";
+import { AccessError, InputError } from "../Error/error.js";
 import Hotel from "../Hotel/Hotel.js";
 import Person from "../Hotel/Person.js";
 import TripInfo from "./TripInfo.js";
@@ -29,10 +30,10 @@ export default class Trip extends TripInfo {
   public addSplit(split: TripSegment) {
     if (this.containsSplit(split.id)) throw new Error("Split id in use");
     if (split.start < this.start)
-      throw new Error("Split start before trip start");
+      throw new InputError("Split start before trip start");
     if (split.end > this.end) throw new Error("Split end after trip end");
     if (this.isOverlapping(split))
-      throw new Error("Split overlaps with other splits");
+      throw new InputError("Split overlaps with other splits");
     this.splits.push(split);
     this.splits.sort((a, b) =>
       a.start.getTime() !== b.start.getTime()
@@ -56,7 +57,7 @@ export default class Trip extends TripInfo {
 
   public removeSplit(id: string): TripSegment {
     const target = this.getSplit(id);
-    if (!target) throw new Error("split does not exist");
+    if (!target) throw new AccessError("split does not exist");
     this.splits = this.splits.filter((s) => s.id !== id);
     return target;
   }
@@ -72,13 +73,13 @@ export default class Trip extends TripInfo {
   // Hotel logic
   public addHotel(splitId: string, hotel: Hotel) {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     target.addHotel(hotel);
   }
 
   public removeHotel(splitId: string, hotelId: string): Hotel {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.removeHotel(hotelId);
   }
 
@@ -89,13 +90,13 @@ export default class Trip extends TripInfo {
   // Itineary logic
   public addDay(splitId: string, day: Day): void {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.addDay(day);
   }
 
   public removeDay(splitId: string, dayId: string): Day {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.removeDay(dayId);
   }
 

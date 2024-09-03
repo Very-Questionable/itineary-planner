@@ -1,3 +1,4 @@
+import { AccessError } from "../Error/error.js";
 import Info from "../Info.js";
 import Itineary from "./Itineary.js";
 export default class Day extends Info {
@@ -18,7 +19,7 @@ export default class Day extends Info {
 
   public addItineary(itineary: Itineary) {
     if (this.containsItineary(itineary.id))
-      throw new Error("Itineary already added");
+      throw new AccessError("Itineary already added");
     this.itinearies.push(itineary);
   }
 
@@ -32,7 +33,7 @@ export default class Day extends Info {
 
   public removeItineary(id: string): Itineary {
     const target = this.itinearies.find((it) => it.id === id);
-    if (!target) throw new Error("Itineary Does not exist");
+    if (!target) throw new AccessError("Itineary Does not exist");
     this.itinearies = this.itinearies.filter((it) => it.id !== id);
     return target;
   }

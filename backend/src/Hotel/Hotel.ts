@@ -1,3 +1,4 @@
+import { AccessError } from "../Error/error.js";
 import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 import Room from "./Room.js";
@@ -27,7 +28,7 @@ export default class Hotel extends HotelInfo {
   public addPerson(roomId: string, person: Person) {
     const target = this.getRoom(roomId);
     if (!target) {
-      throw new Error("Room does not exist");
+      throw new AccessError("Room does not exist");
     }
 
     target.addPerson(person);
@@ -66,7 +67,7 @@ export default class Hotel extends HotelInfo {
 
   public removePerson(roomId: string, personId: string): Person {
     const target = this.getRoom(roomId);
-    if (!target) throw new Error("Room does not exist");
+    if (!target) throw new AccessError("Room does not exist");
 
     return target.removePerson(personId);
   }
@@ -77,7 +78,7 @@ export default class Hotel extends HotelInfo {
    */
   removeRoom(roomId: string): Room {
     const target = this.getRoom(roomId);
-    if (!target) throw new Error("Room does not exist");
+    if (!target) throw new AccessError("Room does not exist");
 
     this.rooms = this.rooms.filter((room) => room.id !== roomId);
     return target;

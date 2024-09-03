@@ -1,3 +1,4 @@
+import { AccessError, InputError } from "../Error/error.js";
 import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 
@@ -26,9 +27,9 @@ export default class Room extends HotelInfo {
    * addPerson
    */
   public addPerson(newPerson: Person) {
-    if (this.containsPerson(newPerson.id)) throw new Error("Person id in use");
+    if (this.containsPerson(newPerson.id)) throw new AccessError("Person id in use");
     if (this.persons.length + 1 > this.capacity) {
-      throw new Error("Capacity for this room has been reach");
+      throw new InputError("Capacity for this room has been reach");
     }
 
     this.persons.push(newPerson);
@@ -40,7 +41,7 @@ export default class Room extends HotelInfo {
   public removePerson(personId: string): Person {
     const target = this.getPerson(personId);
     if (!target) {
-      throw new Error("Invalid person Id, cannot find person");
+      throw new AccessError("Invalid person Id, cannot find person");
     }
 
     this.persons = this.persons.filter((person) => personId !== person.id);
