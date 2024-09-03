@@ -177,7 +177,7 @@ describe("TripSegment Activities Integration", () => {
 
 describe("TripSegment Wellformed", () => {
   test("wellformedness", () => {
-    const myDays = [day1, day2, day3];
+    const myDays = [day1, day3, day2, day4]; // order doesnt matter since it should sort
     const testSegment = new TripSegment(
       "t",
       "t",
@@ -193,7 +193,9 @@ describe("TripSegment Wellformed", () => {
   });
 
   test("Days wellformedness", () => {
-    const myDays = [day1, day2, day4];
+    const invalidDay3 = day3;
+    invalidDay3.id = "hello"
+    const myDays = [day1, day3, invalidDay3, day4];
     const testSegment = new TripSegment(
       "t",
       "t",

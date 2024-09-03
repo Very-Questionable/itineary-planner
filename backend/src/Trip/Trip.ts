@@ -56,7 +56,8 @@ export default class Trip extends TripInfo {
 
   public removeSplit(id: string): TripSegment {
     const target = this.getSplit(id);
-    if (!target) throw new Error("not implemented");
+    if (!target) throw new Error("split does not exist");
+    this.splits = this.splits.filter(s => s.id !== id);
     return target;
   }
 
@@ -106,9 +107,11 @@ export default class Trip extends TripInfo {
     return this.listDays().find((d) => d.id === dayId);
   }
   public listDays(): Array<Day> {
-    return this.splits
-      .flatMap((s) => s.days)
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    const unique = new Set(this.splits.flatMap((s) => s.days));
+    const target = Array.from(unique).sort(
+      (a, b) => a.date.getTime() - b.date.getTime()
+    );
+    return target;
   }
 
   /**
@@ -118,15 +121,18 @@ export default class Trip extends TripInfo {
    *  - start and end dates align with the start and end dates of the splits
    */
   wellformed(): boolean {
-    const wellformedSplits = this.splits.every(s => s.wellformed());
+    const wellformedSplits = this.splits.every((s) => s.wellformed());
     const areDaysSequential = this.listDays().map((day) =>
       Math.abs(day.date.getTime() / (1000 * 60 * 60 * 24))
     );
+
     const sequentialCond = areDaysSequential
       .map((t) => t - areDaysSequential[0])
       .every((v, i) => v === i);
-    const durationCond = this.listDays().length === this.duration();
-    const travellerCond = this.splits.every(s => s.travellers.sort() === this.travellers.sort());
+    const durationCond = this.listDays().length === this.duration() + 1;
+    const travellerCond = this.splits.every(
+      (s) => this.travellers.every((t) => s.containsTraveller(t.id)) && s.travellers.length === this.travellers.length
+    );
     return wellformedSplits && sequentialCond && durationCond && travellerCond;
   }
 }

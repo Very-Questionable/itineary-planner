@@ -131,14 +131,15 @@ export default class TripSegment extends TripInfo {
       (hotel) => hotel.checkIn === this.start && hotel.checkOut === this.end
     );
     const wellformedDays = this.days.every((day) => day.wellformed());
-    const dayDurationCond = this.days.length === this.duration();
+    const dayDurationCond = this.days.length === (this.duration() + 1);
     const areDaysSequential = this.days.map((day) =>
-      Math.abs(day.date.getTime() / (1000 * 60 * 60 * 24))
+      Math.floor(day.date.getTime() / (1000 * 60 * 60 * 24))
     );
     const sequentialCond = areDaysSequential
       .map((t) => t - areDaysSequential[0])
       .every((v, i) => v === i);
-    return (
+    
+      return (
       bookedCond &&
       wellformedHotelsCond &&
       boundaryCond &&

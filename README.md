@@ -161,10 +161,12 @@ classDiagram
 ## TODO
 
 Back end
-- [ ] Hotels
-- [ ] Activities
-- [ ] Transport
+- [x] Hotels
+- [x] Activities
+- [x] Transport
 - [ ] Overviews
+- [ ] Server interface
+- [ ] Refactor to use hashmap
 Front end
 - [ ] Homepage
 - [ ] Hotels UI
