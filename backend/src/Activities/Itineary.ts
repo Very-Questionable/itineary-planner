@@ -1,5 +1,5 @@
-import Info from "../Info";
-import Activity from "./Activity";
+import Info from "../Info.js";
+import Activity from "./Activity.js";
 
 // export type Itineary = SplitDayItineary | WholeDayItineary | FreeDayItineary;
 

@@ -1,5 +1,5 @@
-import Activity, { Activities } from "./Activity";
-import Itineary from "./Itineary";
+import Activity, { Activities } from "./Activity.js";
+import Itineary from "./Itineary.js";
 
 export default class SplitDayItineary extends Itineary {
   private afternoon: Array<Activity>;

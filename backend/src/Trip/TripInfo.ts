@@ -1,5 +1,5 @@
-import Person from "../Hotel/Person";
-import Info from "../Info";
+import Person from "../Hotel/Person.js";
+import Info from "../Info.js";
 
 export default abstract class TripInfo extends Info {
   end: Date;

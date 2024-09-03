@@ -1,8 +1,8 @@
-import Day from "../Activities/Day";
-import Hotel from "../Hotel/Hotel";
-import Person from "../Hotel/Person";
-import TripInfo from "./TripInfo";
-import TripSegment from "./TripSegment";
+import Day from "../Activities/Day.js";
+import Hotel from "../Hotel/Hotel.js";
+import Person from "../Hotel/Person.js";
+import TripInfo from "./TripInfo.js";
+import TripSegment from "./TripSegment.js";
 
 export default class Trip extends TripInfo {
   splits: Array<TripSegment>;
@@ -127,7 +127,7 @@ export default class Trip extends TripInfo {
     );
 
     const sequentialCond = areDaysSequential
-      .map((t) => t - areDaysSequential[0])
+      .map((t) => t - areDaysSequential[0]!)
       .every((v, i) => v === i);
     const durationCond = this.listDays().length === this.duration() + 1;
     const travellerCond = this.splits.every(

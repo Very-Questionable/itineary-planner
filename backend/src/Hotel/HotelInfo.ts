@@ -1,4 +1,4 @@
-import Info from "../Info";
+import Info from "../Info.js";
 
 export default abstract class HotelInfo extends Info {
     checkIn: Date

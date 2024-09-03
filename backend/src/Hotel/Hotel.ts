@@ -1,6 +1,6 @@
-import HotelInfo from "./HotelInfo";
-import Person from "./Person";
-import Room from "./Room";
+import HotelInfo from "./HotelInfo.js";
+import Person from "./Person.js";
+import Room from "./Room.js";
 
 export default class Hotel extends HotelInfo {
   location: string;

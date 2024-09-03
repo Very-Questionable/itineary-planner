@@ -1,5 +1,5 @@
-import Info from "../Info";
-import Itineary from "./Itineary";
+import Info from "../Info.js";
+import Itineary from "./Itineary.js";
 export default class Day extends Info {
   
   date: Date;

@@ -1,5 +1,5 @@
-import HotelInfo from "./HotelInfo";
-import Person from "./Person";
+import HotelInfo from "./HotelInfo.js";
+import Person from "./Person.js";
 
 export default class Room extends HotelInfo {
   capacity: number;
