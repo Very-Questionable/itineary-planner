@@ -6,8 +6,6 @@ import Room from "../src/Hotel/Room";
 import Trip from "../src/Trip/Trip";
 import TripSegment from "../src/Trip/TripSegment";
 
-const beforeDate = new Date(Date.parse("2018-01-01"));
-const afterDate = new Date(Date.parse("2020-01-01"));
 const startdate = new Date(Date.parse("2019-01-01"));
 const date2 = new Date(Date.parse("2019-01-02"));
 const date3 = new Date(Date.parse("2019-01-03"));
