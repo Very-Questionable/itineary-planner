@@ -57,7 +57,7 @@ export default class Trip extends TripInfo {
   public removeSplit(id: string): TripSegment {
     const target = this.getSplit(id);
     if (!target) throw new Error("split does not exist");
-    this.splits = this.splits.filter(s => s.id !== id);
+    this.splits = this.splits.filter((s) => s.id !== id);
     return target;
   }
 
@@ -131,7 +131,9 @@ export default class Trip extends TripInfo {
       .every((v, i) => v === i);
     const durationCond = this.listDays().length === this.duration() + 1;
     const travellerCond = this.splits.every(
-      (s) => this.travellers.every((t) => s.containsTraveller(t.id)) && s.travellers.length === this.travellers.length
+      (s) =>
+        this.travellers.every((t) => s.containsTraveller(t.id)) &&
+        s.travellers.length === this.travellers.length
     );
     return wellformedSplits && sequentialCond && durationCond && travellerCond;
   }
