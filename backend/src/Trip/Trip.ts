@@ -23,8 +23,8 @@ export default class Trip extends TripInfo {
   }
 
   public generateSplitId(): string {
-    let genId = "Split" + Info.generateId();
-    while(this.containsSplit(genId)) genId = "Split" + Info.generateId();
+    let genId = "split" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "split" + Info.generateId();
     return genId;
   }
 
@@ -42,10 +42,11 @@ export default class Trip extends TripInfo {
     if (this.isOverlapping(split))
       throw new InputError("Split overlaps with other splits");
     this.splits.push(split);
-    this.splits.sort((a, b) =>
-      a.start.getTime() !== b.start.getTime()
-        ? a.start.getTime() - b.start.getTime()
-        : a.end.getTime() - b.end.getTime()
+    this.splits.sort((a, b) => 
+      a.start !== b.start
+      ? (new Date(a.start)).getTime() - (new Date(b.start)).getTime()
+      : (new Date(a.end)).getTime() - (new Date(b.end)).getTime()
+    
     );
   }
 
@@ -57,8 +58,8 @@ export default class Trip extends TripInfo {
   private isOverlapping(split: TripSegment): boolean {
     return this.splits.some(
       (s) =>
-        s.end.getTime() > split.start.getTime() &&
-        split.end.getTime() > s.start.getTime()
+        s.end > split.start &&
+        split.end > s.start
     );
   }
 

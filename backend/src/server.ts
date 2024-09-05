@@ -76,10 +76,6 @@ app.delete('/trips/remove/:tripId', catchErrors(async (req:Request, res:Response
 }));
 
 
-app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
-  await reset();
-  return res.status(200).json({});
-}))
 
 /**
 |/splits/{tripId}                               |Lists all splits in a trip|GET    |
@@ -107,7 +103,7 @@ app.get('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response
   return res.status(200).json({split: split});
 }));
 
-app.put('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
+app.put('/splits/update/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
   const { tripId, splitId } = req.params;
   const {info, start, end, hotels, days} = req.body;
   await handleUpdateSplit(tripId,splitId, info, start, end, hotels, days);
@@ -115,11 +111,19 @@ app.put('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response
 }));
 
 app.delete('/splits/remove/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
-  const {tripId, splidId} = req.params;
-  await handleDeleteSplit(tripId, splidId);
+  const {tripId, splitId} = req.params;
+  await handleDeleteSplit(tripId, splitId);
   return res.status(200).json({});
 }));
 
+
+/**
+ * Utils
+ */
+app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
+  await reset();
+  return res.status(200).json({});
+}))
 
 /****************************************
  * Run Server

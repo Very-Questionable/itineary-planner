@@ -229,7 +229,7 @@ export const handleUpdateSplit = async (
 
 
 export const handleDeleteSplit = async (tripId: string, splidId: string) => {
-  lock.acquire("resourseLock", () => {
+  await lock.acquire("resourseLock", () => {
     const targetTrip = trips[tripId];
     if (!targetTrip) throw new AccessError ("Trip does not exist");
     targetTrip.removeSplit(splidId);
