@@ -21,6 +21,16 @@ export default abstract class TripInfo extends Info {
     this.travellers = travelers ? travelers! : [];
   }
 
+  public updateDates(start?: Date, end?: Date) {
+    const newStart: Date = start ? start : this.start;
+    const newEnd: Date = end ? end : this.end;
+    if (newStart > newEnd)
+      throw new InputError("Start after end");
+    this.start = newStart;
+    this.end = newEnd;
+
+  }
+
   /**
    * addTraveller
    */

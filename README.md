@@ -33,16 +33,16 @@ classDiagram
 |/auth/register                                 |registers a user          |POST   |
 |/auth/login                                    |validates a user          |POST   |
 |/auth/logout                                   |logs a user out           |POST   |
-|/trip                                          |lists a user's trips      |GET    |
-|/trip                                          |Creates empty trip        |POST   |
-|/trip/{tripId}                                 |Gets a spacific trip      |GET    |
-|/trip/{tripId}                                 |Updates a specific trip   |PUT    |
-|/trip/{tripId}                                 |Deletes a specific trip   |PUT    |
-|/split/{tripId}                                |Lists all splits in a trip|GET    |
-|/split/{tripId}                                |Creates a new split in a  |POST   |
-|/split/{tripId}/{splitId}                      |Gets specific split in a  |GET    |
-|/split/{tripId}/{splitId}                      |Updates a specific split  |PUT    |
-|/split/{tripId}/{splitId}                      |Removes a specific split  |DELETE |
+|/trips                                         |lists a user's trips      |GET    |
+|/trips/new                                     |Creates empty trip        |POST   |
+|/trips/{tripId}                                |Gets a spacific trip      |GET    |
+|/trips/update/{tripId}                         |Updates a specific trip   |PUT    |
+|/trips/remove/{tripId}                         |Deletes a specific trip   |PUT    |
+|/splits/{tripId}                               |Lists all splits in a trip|GET    |
+|/splits/new/{tripId}                           |Creates a new split in a  |POST   |
+|/splits/get/{tripId}/{splitId}                 |Gets specific split in a  |GET    |
+|/splits/update/{tripId}/{splitId}              |Updates a specific split  |PUT    |
+|/splits/remove/{tripId}/{splitId}              |Removes a specific split  |DELETE |
 |/hotel/{tripId}/{splitId}                      |Lists all hotels          |GET    |
 |/hotel/{tripId}/{splitId}                      |Lists all hotels          |PUT    |
 |/hotel/{tripId}/{splitId}/{hotelId}            |Update hotel              |PUT    |

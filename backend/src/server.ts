@@ -5,7 +5,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import swaggerDoc from '../swagger.json' 
 import { InputError, AccessError } from './Error/error.js';
-import { getTrips, handleCreateNewTrip, handleDeleteTrip, handleGetTrip, handleUpdateTrip, reset, save } from './data.js';
+import { getTrips, handleCreateNewSplit, handleCreateNewTrip, handleDeleteSplit, handleDeleteTrip, handleGetSplit, handleGetSplits, handleGetTrip, handleUpdateSplit, handleUpdateTrip, reset, save } from './data.js';
 
 const app = express();
 
@@ -50,15 +50,14 @@ app.get('/trips', catchErrors(async (req:Request, res:Response) => {
 }));
 
 app.post('/trips/new', catchErrors(async (req:Request, res:Response) => {
-  const {info, start, end, travellers, splits, metadata} = req.body;
-  const newTrip = await handleCreateNewTrip(info,start,end,travellers,splits,metadata);
+  const {info, start, end, metadata} = req.body;
+  const newTrip = await handleCreateNewTrip(info,start,end,metadata);
   return res.status(200).json({ tripId: newTrip });
 }));
 
 app.get('/trips/:tripId', catchErrors(async (req:Request, res:Response) => {
   const {tripId} = req.params
   const trip = handleGetTrip(tripId)
-  console.log(trip)
   return res.status(200).json({trip: trip});
 }));
 
@@ -81,6 +80,45 @@ app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
   await reset();
   return res.status(200).json({});
 }))
+
+/**
+|/splits/{tripId}                               |Lists all splits in a trip|GET    |
+|/splits/new/{tripId}                           |Creates a new split in a  |POST   |
+|/splits/get/{tripId}/{splitId}                 |Gets specific split in a  |GET    |
+|/splits/update/{tripId}/{splitId}              |Updates a specific split  |PUT    |
+|/splits/remove/{tripId}/{splitId}              |Removes a specific split  |DELETE |
+*/
+app.post('/splits/new/:tripId', catchErrors(async (req:Request, res:Response) => {
+  const { tripId } = req.params;
+  const {info, start, end} = req.body;
+  const splitId = await handleCreateNewSplit(tripId, info, start, end);
+  return res.status(200).json({splitId: splitId});
+}));
+
+app.get('/splits/:tripId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  const splits = handleGetSplits(tripId);
+  return res.status(200).json({splits: splits});
+}));
+
+app.get('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId} = req.params;
+  const split = handleGetSplit(tripId, splitId);
+  return res.status(200).json({split: split});
+}));
+
+app.put('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
+  const { tripId, splitId } = req.params;
+  const {info, start, end, hotels, days} = req.body;
+  await handleUpdateSplit(tripId,splitId, info, start, end, hotels, days);
+  return res.status(200).json({});
+}));
+
+app.delete('/splits/remove/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splidId} = req.params;
+  await handleDeleteSplit(tripId, splidId);
+  return res.status(200).json({});
+}));
 
 
 /****************************************
