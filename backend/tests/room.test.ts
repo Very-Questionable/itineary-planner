@@ -1,4 +1,4 @@
-import Room from "../src/Hotel/Room";
+import Room from "../src/Hotel/Room.js";
 
 describe("Room Tests", () => {
   test("Test room Defined", () => {

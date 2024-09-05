@@ -1,6 +1,6 @@
-import Hotel from "../src/Hotel/Hotel";
-import Person from "../src/Hotel/Person";
-import Room from "../src/Hotel/Room";
+import Hotel from "../src/Hotel/Hotel.js";
+import Person from "../src/Hotel/Person.js";
+import Room from "../src/Hotel/Room.js";
 
 describe("Hotel Tests", () => {
   test("Hotel Defined", () => {
@@ -62,6 +62,7 @@ describe("Hotel Tests", () => {
     expect(() => myHotel.removeRoom("0")).toThrow();
     expect(myHotel.removeRoom("1")).toStrictEqual(singleRoom);
     expect(myEmptyHotel).toStrictEqual(myHotel);
+    
   });
 
   test("Wellformed", () => {

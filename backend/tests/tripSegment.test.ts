@@ -1,12 +1,12 @@
-import Activity, { Activities } from "../src/Activities/Activity";
-import Day from "../src/Activities/Day";
-import FreeDayItineary from "../src/Activities/FreeDayItineary";
-import SplitDayItineary from "../src/Activities/SplitDayItineary";
-import WholeDayItineary from "../src/Activities/WholeDayItineary";
-import Hotel from "../src/Hotel/Hotel";
-import Person from "../src/Hotel/Person";
-import Room from "../src/Hotel/Room";
-import TripSegment from "../src/Trip/TripSegment";
+import Activity, { Activities } from "../src/Activities/Activity.js";
+import Day from "../src/Activities/Day.js";
+import FreeDayItineary from "../src/Activities/FreeDayItineary.js";
+import SplitDayItineary from "../src/Activities/SplitDayItineary.js";
+import WholeDayItineary from "../src/Activities/WholeDayItineary.js";
+import Hotel from "../src/Hotel/Hotel.js";
+import Person from "../src/Hotel/Person.js";
+import Room from "../src/Hotel/Room.js";
+import TripSegment from "../src/Trip/TripSegment.js";
 
 const beforeDate = new Date(Date.parse("2018-01-01"));
 const afterDate = new Date(Date.parse("2020-01-01"));

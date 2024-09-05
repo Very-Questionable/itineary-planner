@@ -1,5 +1,5 @@
-import Activity from "./Activity";
-import Itineary from "./Itineary";
+import Activity from "./Activity.js";
+import Itineary from "./Itineary.js";
 
 export default class FreeDayItineary extends Itineary {
   constructor(id: string, info: string, metadata?: object) {

@@ -1,8 +1,8 @@
-import Activity, { Activities } from "../src/Activities/Activity"
-import Day from "../src/Activities/Day"
-import FreeDayItineary from "../src/Activities/FreeDayItineary"
-import SplitDayItineary from "../src/Activities/SplitDayItineary"
-import WholeDayItineary from "../src/Activities/WholeDayItineary"
+import Activity, { Activities } from "../src/Activities/Activity.js"
+import Day from "../src/Activities/Day.js"
+import FreeDayItineary from "../src/Activities/FreeDayItineary.js"
+import SplitDayItineary from "../src/Activities/SplitDayItineary.js"
+import WholeDayItineary from "../src/Activities/WholeDayItineary.js"
 
 
 const myActivity: Activity = {

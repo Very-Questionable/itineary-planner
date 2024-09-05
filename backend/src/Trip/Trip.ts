@@ -1,8 +1,10 @@
-import Day from "../Activities/Day";
-import Hotel from "../Hotel/Hotel";
-import Person from "../Hotel/Person";
-import TripInfo from "./TripInfo";
-import TripSegment from "./TripSegment";
+import Day from "../Activities/Day.js";
+import { AccessError, InputError } from "../Error/error.js";
+import Hotel from "../Hotel/Hotel.js";
+import Person from "../Hotel/Person.js";
+import Info from "../Info.js";
+import TripInfo from "./TripInfo.js";
+import TripSegment from "./TripSegment.js";
 
 export default class Trip extends TripInfo {
   splits: Array<TripSegment>;
@@ -20,6 +22,12 @@ export default class Trip extends TripInfo {
     this.splits = splits ? splits! : [];
   }
 
+  public generateSplitId(): string {
+    let genId = "split" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "split" + Info.generateId();
+    return genId;
+  }
+
   /**
    * add split: Adds a trip segment to a split
    * Split cannot be before trip start, split cannot be after trip start
@@ -29,15 +37,16 @@ export default class Trip extends TripInfo {
   public addSplit(split: TripSegment) {
     if (this.containsSplit(split.id)) throw new Error("Split id in use");
     if (split.start < this.start)
-      throw new Error("Split start before trip start");
+      throw new InputError("Split start before trip start");
     if (split.end > this.end) throw new Error("Split end after trip end");
     if (this.isOverlapping(split))
-      throw new Error("Split overlaps with other splits");
+      throw new InputError("Split overlaps with other splits");
     this.splits.push(split);
-    this.splits.sort((a, b) =>
-      a.start.getTime() !== b.start.getTime()
-        ? a.start.getTime() - b.start.getTime()
-        : a.end.getTime() - b.end.getTime()
+    this.splits.sort((a, b) => 
+      a.start !== b.start
+      ? (new Date(a.start)).getTime() - (new Date(b.start)).getTime()
+      : (new Date(a.end)).getTime() - (new Date(b.end)).getTime()
+    
     );
   }
 
@@ -49,14 +58,14 @@ export default class Trip extends TripInfo {
   private isOverlapping(split: TripSegment): boolean {
     return this.splits.some(
       (s) =>
-        s.end.getTime() > split.start.getTime() &&
-        split.end.getTime() > s.start.getTime()
+        s.end > split.start &&
+        split.end > s.start
     );
   }
 
   public removeSplit(id: string): TripSegment {
     const target = this.getSplit(id);
-    if (!target) throw new Error("split does not exist");
+    if (!target) throw new AccessError("split does not exist");
     this.splits = this.splits.filter((s) => s.id !== id);
     return target;
   }
@@ -72,13 +81,13 @@ export default class Trip extends TripInfo {
   // Hotel logic
   public addHotel(splitId: string, hotel: Hotel) {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     target.addHotel(hotel);
   }
 
   public removeHotel(splitId: string, hotelId: string): Hotel {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.removeHotel(hotelId);
   }
 
@@ -89,13 +98,13 @@ export default class Trip extends TripInfo {
   // Itineary logic
   public addDay(splitId: string, day: Day): void {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.addDay(day);
   }
 
   public removeDay(splitId: string, dayId: string): Day {
     const target = this.getSplit(splitId);
-    if (!target) throw new Error("Split not found");
+    if (!target) throw new AccessError("Split not found");
     return target.removeDay(dayId);
   }
 
@@ -127,7 +136,7 @@ export default class Trip extends TripInfo {
     );
 
     const sequentialCond = areDaysSequential
-      .map((t) => t - areDaysSequential[0])
+      .map((t) => t - areDaysSequential[0]!)
       .every((v, i) => v === i);
     const durationCond = this.listDays().length === this.duration() + 1;
     const travellerCond = this.splits.every(

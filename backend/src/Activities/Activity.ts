@@ -8,7 +8,6 @@ export default interface Activity {
   name: string,
   info: string,
   location: string,
-  images?: Array<string>,
   metadata?: object
 }
 /**

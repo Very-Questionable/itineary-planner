@@ -1,5 +1,7 @@
-import Info from "../Info";
-import Itineary from "./Itineary";
+import { AccessError } from "../Error/error.js";
+import Info from "../Info.js";
+import Activity from "./Activity.js";
+import Itineary from "./Itineary.js";
 export default class Day extends Info {
   
   date: Date;
@@ -18,8 +20,29 @@ export default class Day extends Info {
 
   public addItineary(itineary: Itineary) {
     if (this.containsItineary(itineary.id))
-      throw new Error("Itineary already added");
+      throw new AccessError("Itineary already added");
     this.itinearies.push(itineary);
+  }
+  
+  public generateItinearyId(): string {
+    let genId = "Itineary" + Info.generateId();
+    while(this.containsItineary(genId)) genId = "Itineary" + Info.generateId();
+    return genId;
+  }
+
+  public generateActivityId(): string {
+    let genId = "Activity" + Info.generateId();
+    while(this.containsItineary(genId)) genId = "Activity" + Info.generateId();
+    return genId;
+
+  }
+
+  public containsActivity(id: string): boolean {
+    return this.itinearies.flatMap(it => it.listActivities()).some(act => act.id === id);
+  }
+  
+  public getActivity(id: string): Activity|undefined {
+    return this.itinearies.flatMap(it => it.listActivities()).find(act => act.id === id);
   }
 
   public getItineary(id: string): Itineary | undefined {
@@ -32,7 +55,7 @@ export default class Day extends Info {
 
   public removeItineary(id: string): Itineary {
     const target = this.itinearies.find((it) => it.id === id);
-    if (!target) throw new Error("Itineary Does not exist");
+    if (!target) throw new AccessError("Itineary Does not exist");
     this.itinearies = this.itinearies.filter((it) => it.id !== id);
     return target;
   }

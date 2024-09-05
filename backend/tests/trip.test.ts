@@ -1,10 +1,10 @@
-import Day from "../src/Activities/Day";
-import FreeDayItineary from "../src/Activities/FreeDayItineary";
-import Hotel from "../src/Hotel/Hotel";
-import Person from "../src/Hotel/Person";
-import Room from "../src/Hotel/Room";
-import Trip from "../src/Trip/Trip";
-import TripSegment from "../src/Trip/TripSegment";
+import Day from "../src/Activities/Day.js";
+import FreeDayItineary from "../src/Activities/FreeDayItineary.js";
+import Hotel from "../src/Hotel/Hotel.js";
+import Person from "../src/Hotel/Person.js";
+import Room from "../src/Hotel/Room.js";
+import Trip from "../src/Trip/Trip.js";
+import TripSegment from "../src/Trip/TripSegment.js";
 
 const startdate = new Date(Date.parse("2019-01-01"));
 const date2 = new Date(Date.parse("2019-01-02"));
