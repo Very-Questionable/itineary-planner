@@ -28,7 +28,6 @@ export default abstract class TripInfo extends Info {
       throw new InputError("Start after end");
     this.start = newStart;
     this.end = newEnd;
-
   }
 
   /**

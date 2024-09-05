@@ -5,7 +5,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import swaggerDoc from '../swagger.json' 
 import { InputError, AccessError } from './Error/error.js';
-import { getTrips, handleCreateNewSplit, handleCreateNewTrip, handleDeleteSplit, handleDeleteTrip, handleGetSplit, handleGetSplits, handleGetTrip, handleUpdateSplit, handleUpdateTrip, reset, save } from './data.js';
+import { getTrips, handleCreateNewHotel, handleCreateNewSplit, handleCreateNewTrip, handleDeleteHotel, handleDeleteSplit, handleDeleteTrip, handleGetHotel, handleGetHotels, handleGetSplit, handleGetSplits, handleGetTrip, handleUpdateHotel, handleUpdateSplit, handleUpdateTrip, reset, save } from './data.js';
 
 const app = express();
 
@@ -125,6 +125,51 @@ app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
   return res.status(200).json({});
 }))
 
+
+/**
+ *
+ * |/hotel/{tripId}/{splitId}                      |Lists all hotels          |GET    |
+ * |/hotel/{tripId}/{splitId}                      |Lists all hotels          |POST    |
+ * |/hotel/{tripId}/{splitId}/{hotelId}            |Gets specific hotel       |GET    |
+ * |/hotel/{tripId}/{splitId}/{hotelId}            |Update hotel              |PUT    |
+ * |/hotel/{tripId}/{splitId}/{hotelId}            |Removes Hotel             |DELETE |
+ * 
+*/
+app.put("/hotels/new/:tripId/:splitId", catchErrors (async (req:Request, res:Response) => {
+  const { tripId, splitId } = req.params;
+  const { info, checkIn, checkOut, location } = req.body;
+  const hotelId = await handleCreateNewHotel(tripId,splitId,info,checkIn,checkOut,location);
+  return res.status(200).json({ hotelId: hotelId});
+}));
+
+app.get("/hotels/:tripId/:splitId", catchErrors (async (req:Request, res:Response) => {
+  const { tripId, splitId } = req.params;
+  const hotels = await handleGetHotels(tripId,splitId);
+  return res.status(200).json({ hotels: hotels })
+}));
+
+app.get("/hotels/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
+  const { tripId, splitId, hotelId } = req.params;
+  const hotel = await handleGetHotel(tripId,splitId, hotelId);
+  return res.status(200).json({ hotel: hotel, wellformedness: hotel.wellformed() })
+
+}));
+
+app.put("/hotels/update/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
+  const { tripId, splitId, hotelId } = req.params;
+  const { info, checkIn, checkOut, location, rooms, metadata } = req.body;
+  await handleUpdateHotel(tripId,splitId, hotelId, info, checkIn, checkOut, location, rooms, metadata);
+  return res.status(200).json({})
+}));
+
+app.delete("/hotels/remove/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
+  const { tripId, splitId, hotelId } = req.params;
+  await handleDeleteHotel(tripId,splitId, hotelId);
+  return res.status(200).json({})
+
+}));
+
+
 /****************************************
  * Run Server
 *****************************************/
@@ -141,3 +186,4 @@ const server = app.listen(port, () => {
 });
 
 export default server;
+
