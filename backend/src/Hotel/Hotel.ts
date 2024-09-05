@@ -1,4 +1,5 @@
 import { AccessError } from "../Error/error.js";
+import Info from "../Info.js";
 import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 import Room from "./Room.js";
@@ -20,6 +21,12 @@ export default class Hotel extends HotelInfo {
 
     this.location = location;
     this.rooms = rooms ? rooms! : [];
+  }
+
+  public generateRoomId(): string {
+    let genId = "Room" + Info.generateId();
+    while(this.containsRoom(genId)) genId = "Room" + Info.generateId();
+    return genId;
   }
 
   /**

@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 export default abstract class Info {
     info: string
     id: string
@@ -9,4 +11,14 @@ export default abstract class Info {
     }
 
     abstract wellformed() : boolean
+
+    static generateId(): string {
+        return randomUUID();
+    }
+  updateInfo(info?: string, metadata?: object) {
+    if (info) this.info = info;
+    if (metadata) this.metadata = metadata;
+  }
+
 }
+

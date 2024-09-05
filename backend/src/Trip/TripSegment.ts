@@ -2,6 +2,7 @@ import Day from "../Activities/Day.js";
 import { AccessError, InputError } from "../Error/error.js";
 import Hotel from "../Hotel/Hotel.js";
 import Person from "../Hotel/Person.js";
+import Info from "../Info.js";
 import TripInfo from "./TripInfo.js";
 
 export default class TripSegment extends TripInfo {
@@ -22,6 +23,18 @@ export default class TripSegment extends TripInfo {
     this.days = days
       ? days!.sort((a, b) => a.date.getTime() - b.date.getTime())
       : [];
+  }
+
+  public generateHotelId(): string {
+    let genId = "Hotel" + Info.generateId();
+    while(this.containsHotel(genId)) genId = "Hotel" + Info.generateId();
+    return genId;
+  }
+
+  public generateDayId(): string {
+    let genId = "Day" + Info.generateId();
+    while(this.containsDay(genId)) genId = "Day" + Info.generateId();
+    return genId;
   }
 
   private containsDate(date: Date): boolean {

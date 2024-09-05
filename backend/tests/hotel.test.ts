@@ -62,6 +62,7 @@ describe("Hotel Tests", () => {
     expect(() => myHotel.removeRoom("0")).toThrow();
     expect(myHotel.removeRoom("1")).toStrictEqual(singleRoom);
     expect(myEmptyHotel).toStrictEqual(myHotel);
+    
   });
 
   test("Wellformed", () => {

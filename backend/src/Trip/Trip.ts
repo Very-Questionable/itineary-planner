@@ -2,6 +2,7 @@ import Day from "../Activities/Day.js";
 import { AccessError, InputError } from "../Error/error.js";
 import Hotel from "../Hotel/Hotel.js";
 import Person from "../Hotel/Person.js";
+import Info from "../Info.js";
 import TripInfo from "./TripInfo.js";
 import TripSegment from "./TripSegment.js";
 
@@ -19,6 +20,12 @@ export default class Trip extends TripInfo {
   ) {
     super(id, info, start, end, travellers, metadata);
     this.splits = splits ? splits! : [];
+  }
+
+  public generateSplitId(): string {
+    let genId = "Split" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "Split" + Info.generateId();
+    return genId;
   }
 
   /**

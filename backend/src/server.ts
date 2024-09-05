@@ -3,11 +3,9 @@ import swaggerUi from 'swagger-ui-express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
-import swaggerDoc from '../swagger.json' with { type: 'json' }
+import swaggerDoc from '../swagger.json' 
 import { InputError, AccessError } from './Error/error.js';
-import Trip from './Trip/Trip.js';
-import { randomUUID } from 'crypto';
-import { save } from './data.js';
+import { getTrips, handleCreateNewTrip, handleDeleteTrip, handleGetTrip, handleUpdateTrip, reset, save } from './data.js';
 
 const app = express();
 
@@ -26,7 +24,7 @@ const catchErrors = (fn: CallableFunction) => async (req: Request, res: Response
       console.log(`Body params are ${JSON.stringify(req.body)}`);
     }
     await fn(req, res);
-    save();
+    await save();
   } catch (err) {
     if (err instanceof InputError) {
       res.status(400).send({ error: err.message });
@@ -47,16 +45,43 @@ const catchErrors = (fn: CallableFunction) => async (req: Request, res: Response
 /******************************************
  * Get Trips
  ******************************************/
-app.get('/trips', (req, res) => {});
+app.get('/trips', catchErrors(async (req:Request, res:Response) => {
+  return res.status(200).json({ trips: getTrips() })
+}));
 
-app.post('/trip', (req, res) => {
-  const {info, start, end} = req.body;
-  const newTrip = new Trip(`trip${start}${randomUUID()}`,info, start, end); 
-  return res.status(200).json({ trips: newTrip});
-});
+app.post('/trips/new', catchErrors(async (req:Request, res:Response) => {
+  const {info, start, end, travellers, splits, metadata} = req.body;
+  const newTrip = await handleCreateNewTrip(info,start,end,travellers,splits,metadata);
+  return res.status(200).json({ tripId: newTrip });
+}));
 
-app.get('/trip', (req, res) => {});
-app.get('/trip', (req, res) => {});
+app.get('/trips/:tripId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params
+  const trip = handleGetTrip(tripId)
+  console.log(trip)
+  return res.status(200).json({trip: trip});
+}));
+
+app.put('/trips/update/:tripId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  const {info, start, end, travellers, splits, metadata} = req.body;
+
+  await handleUpdateTrip(tripId,info,start,end,travellers,splits,metadata);
+  return res.status(200).json({});
+}));
+
+app.delete('/trips/remove/:tripId', catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  await handleDeleteTrip(tripId);
+  return res.status(200).json({});
+}));
+
+
+app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
+  await reset();
+  return res.status(200).json({});
+}))
+
 
 /****************************************
  * Run Server
