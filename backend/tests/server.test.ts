@@ -21,7 +21,7 @@ const deleteTry = async (
   payload: object,
   token = null
 ) => sendTry("delete", path, status, payload, token);
- 
+
 const putTry = async (
   path: string,
   status: number,
@@ -100,7 +100,7 @@ describe("Routes testing", () => {
     await deleteTry(`/trips/remove/${id1}`, 200, {});
 
     await getTry(`/trips/${id1}`, 403, {});
-    
+
     await putTry(`/trips/update/${id2}`, 200, {
       info: "Hello3",
     });
@@ -109,7 +109,6 @@ describe("Routes testing", () => {
     expect(res3.trip.info).toStrictEqual("Hello3");
     expect(Date.parse(res3.trip.start)).toStrictEqual(startdate.getTime());
     expect(Date.parse(res3.trip.end)).toStrictEqual(endDate.getTime());
-
   });
   test("Splits test", async () => {
     const trip1 = await postTry("/trips/new", 200, {
@@ -125,35 +124,33 @@ describe("Routes testing", () => {
     expect(Date.parse(trips[id1].start)).toStrictEqual(startdate.getTime());
     expect(Date.parse(trips[id1].end)).toStrictEqual(endDate.getTime());
 
-    const s1 = await postTry(`/splits/new/${id1}`,200,{
+    const s1 = await postTry(`/splits/new/${id1}`, 200, {
       info: "Hello",
       start: startdate,
-      end: day3
+      end: day3,
     });
-    const s2 = await postTry(`/splits/new/${id1}`,200,{
+    const s2 = await postTry(`/splits/new/${id1}`, 200, {
       info: "Hello2",
       start: day3,
-      end: endDate
-    })
+      end: endDate,
+    });
 
     const splitId1 = s1.splitId;
     const splitId2 = s2.splitId;
 
-    const allSplits = await getTry(`/splits/${id1}`,200,{});
+    const allSplits = await getTry(`/splits/${id1}`, 200, {});
 
-    const split1 = await getTry(`/splits/${id1}/${splitId1}`,200,{});
-    const split2 = await getTry(`/splits/${id1}/${splitId2}`,200,{});
+    const split1 = await getTry(`/splits/${id1}/${splitId1}`, 200, {});
+    const split2 = await getTry(`/splits/${id1}/${splitId2}`, 200, {});
     expect(allSplits.splits).toStrictEqual([split1.split, split2.split]);
-    
-  
+
     await deleteTry(`/splits/remove/${id1}/${splitId1}`, 200, {});
     await getTry(`/splits/${id1}/${splitId1}`, 403, {});
-    
+
     await putTry(`/splits/update/${id1}/${splitId2}`, 200, {
       info: "Hello3",
-      start: day2
+      start: day2,
     });
-
 
     const res3 = await getTry(`/splits/${id1}/${splitId2}`, 200, {});
     expect(res3.split.info).toStrictEqual("Hello3");
@@ -162,56 +159,154 @@ describe("Routes testing", () => {
   });
 
   test("Hotel", async () => {
-    const {tripId} = await postTry("/trips/new", 200, {
+    const { tripId } = await postTry("/trips/new", 200, {
       info: "Hello",
       start: startdate,
       end: endDate,
     });
 
-
-    const {splitId} = await postTry(`/splits/new/${tripId}`,200,{
+    const { splitId } = await postTry(`/splits/new/${tripId}`, 200, {
       info: "Hello",
       start: startdate,
-      end: endDate
+      end: endDate,
     });
-    
 
-    const res = await postTry(`/hotels/new/${tripId}/${splitId}`,200, {
+    const res = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, {
       info: "Hotel",
       checkIn: startdate,
       checkOut: endDate,
-      location: "Town"
-    })
+      location: "Town",
+    });
 
     expect(res.hotelId).toStrictEqual(expect.any(String));
-    
-    const res2 = await postTry(`/hotels/new/${tripId}/${splitId}`,200, {
+
+    const res2 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, {
       info: "Hotel2",
       checkIn: startdate,
       checkOut: endDate,
-      location: "Town2"
+      location: "Town2",
     });
-    
-    expect(res2.hotelId).toStrictEqual(expect.any(String));
-    
-    const {hotels} = await getTry(`/hotels/${tripId}/${splitId}`,200, {});
 
-    const hotel1 = await getTry(`/hotels/${tripId}/${splitId}/${res.hotelId}`,200, {});
-    const hotel2 = await getTry(`/hotels/${tripId}/${splitId}/${res2.hotelId}`,200, {});
+    expect(res2.hotelId).toStrictEqual(expect.any(String));
+
+    const { hotels } = await getTry(`/hotels/${tripId}/${splitId}`, 200, {});
+
+    const hotel1 = await getTry(
+      `/hotels/${tripId}/${splitId}/${res.hotelId}`,
+      200,
+      {}
+    );
+    const hotel2 = await getTry(
+      `/hotels/${tripId}/${splitId}/${res2.hotelId}`,
+      200,
+      {}
+    );
     expect(hotels).toStrictEqual([hotel1.hotel, hotel2.hotel]);
 
-    await deleteTry(`/hotels/remove/${tripId}/${splitId}/${res.hotelId}`, 200, {});
+    await deleteTry(
+      `/hotels/remove/${tripId}/${splitId}/${res.hotelId}`,
+      200,
+      {}
+    );
     await getTry(`/hotels/${tripId}/${splitId}/${res.hotelId}`, 403, {});
-    
+
     await putTry(`/hotels/update/${tripId}/${splitId}/${res2.hotelId}`, 200, {
       location: "Hello3",
-      checkIn: day2
+      checkIn: day2,
     });
 
-
-    const res3 = await getTry(`/hotels/${tripId}/${splitId}/${res2.hotelId}`, 200, {});
+    const res3 = await getTry(
+      `/hotels/${tripId}/${splitId}/${res2.hotelId}`,
+      200,
+      {}
+    );
     expect(res3.hotel.location).toStrictEqual("Hello3");
     expect(Date.parse(res3.hotel.checkIn)).toStrictEqual(day2.getTime());
     expect(Date.parse(res3.hotel.checkOut)).toStrictEqual(endDate.getTime());
-  })
+  });
+
+  test("Room tests", async () => {
+    const { tripId } = await postTry("/trips/new", 200, {
+      info: "Hello",
+      start: startdate,
+      end: endDate,
+    });
+
+    const { splitId } = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Hello",
+      start: startdate,
+      end: endDate,
+    });
+
+    const { hotelId } = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, {
+      info: "Hotel",
+      checkIn: startdate,
+      checkOut: endDate,
+      location: "Town",
+    });
+
+    const r1 = await postTry(
+      `/rooms/new/${tripId}/${splitId}/${hotelId}`,
+      200,
+      {
+        info: "room1",
+        price: 200,
+        capacity: 1,
+      }
+    );
+
+    const r2 = await postTry(
+      `/rooms/new/${tripId}/${splitId}/${hotelId}`,
+      200,
+      {
+        info: "room2",
+        price: 300,
+        capacity: 1,
+      }
+    );
+
+    const { rooms } = await getTry(
+      `/rooms/${tripId}/${splitId}/${hotelId}`,
+      200,
+      {}
+    );
+    const room1 = await getTry(
+      `/rooms/${tripId}/${splitId}/${hotelId}/${r1.roomId}`,
+      200,
+      {}
+    );
+    const room2 = await getTry(
+      `/rooms/${tripId}/${splitId}/${hotelId}/${r2.roomId}`,
+      200,
+      {}
+    );
+    expect(rooms).toStrictEqual([room1.room, room2.room]);
+
+    await deleteTry(
+      `/rooms/remove/${tripId}/${splitId}/${hotelId}/${r1.roomId}`,
+      200,
+      {}
+    );
+    await getTry(
+      `/rooms/${tripId}/${splitId}/${hotelId}/${room1.roomId}`,
+      403,
+      {}
+    );
+
+    await putTry(
+      `/rooms/update/${tripId}/${splitId}/${hotelId}/${r2.roomId}`,
+      200,
+      {
+        price: 200,
+        capacity: 2,
+      }
+    );
+    const res3 = await getTry(
+      `/rooms/${tripId}/${splitId}/${hotelId}/${r2.roomId}`,
+      200,
+      {}
+    );
+    expect(res3.room.capacity).toStrictEqual(2);
+    expect(res3.room.price).toStrictEqual(200);
+  });
 });

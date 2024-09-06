@@ -43,11 +43,11 @@ classDiagram
 |/splits/get/{tripId}/{splitId}                 |Gets specific split in a  |GET    |
 |/splits/update/{tripId}/{splitId}              |Updates a specific split  |PUT    |
 |/splits/remove/{tripId}/{splitId}              |Removes a specific split  |DELETE |
-|/hotel/{tripId}/{splitId}                      |Lists all hotels          |GET    |
-|/hotel/{tripId}/{splitId}                      |Lists all hotels          |PUT    |
-|/hotel/{tripId}/{splitId}/{hotelId}            |Update hotel              |PUT    |
-|/hotel/{tripId}/{splitId}/{hotelId}            |Removes Hotel             |DELETE |
-|/hotel/{tripId}/{splitId}/{hotelId}            |Gets specific hotel       |GET    |
+|/hotels/{tripId}/{splitId}                     |Lists all hotels          |GET    |
+|/hotels/{tripId}/{splitId}                     |Lists all hotels          |PUT    |
+|/hotels/{tripId}/{splitId}/{hotelId}           |Update hotel              |PUT    |
+|/hotels/{tripId}/{splitId}/{hotelId}           |Removes Hotel             |DELETE |
+|/hotels/{tripId}/{splitId}/{hotelId}           |Gets specific hotel       |GET    |
 |/room/{tripId}/{splitId}/{hotelId}             |Lists Rooms for a hotel   |GET    |
 |/room/{tripId}/{splitId}/{hotelId}             |Lists Rooms for a hotel   |GET    |
 |/room/{tripId}/{splitId}/{hotelId}/{roomId}    |Gets specific room        |GET    |
