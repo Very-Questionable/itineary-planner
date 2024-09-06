@@ -74,7 +74,7 @@ export default abstract class TripInfo extends Info {
    */
   public duration(): number {
     return Math.floor(
-      Math.abs(this.end.getTime() - this.start.getTime()) /
+      Math.abs((new Date(this.end)).getTime() - (new Date(this.start)).getTime()) /
         (1000 * 60 * 60 * 24)
     );
   }

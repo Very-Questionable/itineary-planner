@@ -129,7 +129,7 @@ describe("Routes testing", () => {
       info: "Hello",
       start: startdate,
       end: day3
-    })
+    });
     const s2 = await postTry(`/splits/new/${id1}`,200,{
       info: "Hello2",
       start: day3,
@@ -160,4 +160,58 @@ describe("Routes testing", () => {
     expect(Date.parse(res3.split.start)).toStrictEqual(day2.getTime());
     expect(Date.parse(res3.split.end)).toStrictEqual(endDate.getTime());
   });
+
+  test("Hotel", async () => {
+    const {tripId} = await postTry("/trips/new", 200, {
+      info: "Hello",
+      start: startdate,
+      end: endDate,
+    });
+
+
+    const {splitId} = await postTry(`/splits/new/${tripId}`,200,{
+      info: "Hello",
+      start: startdate,
+      end: endDate
+    });
+    
+
+    const res = await postTry(`/hotels/new/${tripId}/${splitId}`,200, {
+      info: "Hotel",
+      checkIn: startdate,
+      checkOut: endDate,
+      location: "Town"
+    })
+
+    expect(res.hotelId).toStrictEqual(expect.any(String));
+    
+    const res2 = await postTry(`/hotels/new/${tripId}/${splitId}`,200, {
+      info: "Hotel2",
+      checkIn: startdate,
+      checkOut: endDate,
+      location: "Town2"
+    });
+    
+    expect(res2.hotelId).toStrictEqual(expect.any(String));
+    
+    const {hotels} = await getTry(`/hotels/${tripId}/${splitId}`,200, {});
+
+    const hotel1 = await getTry(`/hotels/${tripId}/${splitId}/${res.hotelId}`,200, {});
+    const hotel2 = await getTry(`/hotels/${tripId}/${splitId}/${res2.hotelId}`,200, {});
+    expect(hotels).toStrictEqual([hotel1.hotel, hotel2.hotel]);
+
+    await deleteTry(`/hotels/remove/${tripId}/${splitId}/${res.hotelId}`, 200, {});
+    await getTry(`/hotels/${tripId}/${splitId}/${res.hotelId}`, 403, {});
+    
+    await putTry(`/hotels/update/${tripId}/${splitId}/${res2.hotelId}`, 200, {
+      location: "Hello3",
+      checkIn: day2
+    });
+
+
+    const res3 = await getTry(`/hotels/${tripId}/${splitId}/${res2.hotelId}`, 200, {});
+    expect(res3.hotel.location).toStrictEqual("Hello3");
+    expect(Date.parse(res3.hotel.checkIn)).toStrictEqual(day2.getTime());
+    expect(Date.parse(res3.hotel.checkOut)).toStrictEqual(endDate.getTime());
+  })
 });

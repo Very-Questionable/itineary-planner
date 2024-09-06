@@ -58,15 +58,15 @@ app.post('/trips/new', catchErrors(async (req:Request, res:Response) => {
 app.get('/trips/:tripId', catchErrors(async (req:Request, res:Response) => {
   const {tripId} = req.params
   const trip = handleGetTrip(tripId)
-  return res.status(200).json({trip: trip});
+  return res.status(200).json({trip: trip, wellformed: trip.wellformed() });
 }));
 
 app.put('/trips/update/:tripId', catchErrors(async (req:Request, res:Response) => {
   const {tripId} = req.params;
   const {info, start, end, travellers, splits, metadata} = req.body;
 
-  await handleUpdateTrip(tripId,info,start,end,travellers,splits,metadata);
-  return res.status(200).json({});
+  const wellformed = await handleUpdateTrip(tripId,info,start,end,travellers,splits,metadata);
+  return res.status(200).json({ wellformed: wellformed });
 }));
 
 app.delete('/trips/remove/:tripId', catchErrors(async (req:Request, res:Response) => {
@@ -100,7 +100,7 @@ app.get('/splits/:tripId', catchErrors(async (req:Request, res:Response) => {
 app.get('/splits/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
   const {tripId, splitId} = req.params;
   const split = handleGetSplit(tripId, splitId);
-  return res.status(200).json({split: split});
+  return res.status(200).json({split: split, wellformed: split.wellformed()});
 }));
 
 app.put('/splits/update/:tripId/:splitId', catchErrors(async (req:Request, res:Response) => {
@@ -135,7 +135,7 @@ app.delete('/clear', catchErrors(async (req:Request, res:Response) => {
  * |/hotel/{tripId}/{splitId}/{hotelId}            |Removes Hotel             |DELETE |
  * 
 */
-app.put("/hotels/new/:tripId/:splitId", catchErrors (async (req:Request, res:Response) => {
+app.post("/hotels/new/:tripId/:splitId", catchErrors (async (req:Request, res:Response) => {
   const { tripId, splitId } = req.params;
   const { info, checkIn, checkOut, location } = req.body;
   const hotelId = await handleCreateNewHotel(tripId,splitId,info,checkIn,checkOut,location);
@@ -151,15 +151,15 @@ app.get("/hotels/:tripId/:splitId", catchErrors (async (req:Request, res:Respons
 app.get("/hotels/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
   const { tripId, splitId, hotelId } = req.params;
   const hotel = await handleGetHotel(tripId,splitId, hotelId);
-  return res.status(200).json({ hotel: hotel, wellformedness: hotel.wellformed() })
+  return res.status(200).json({ hotel: hotel, wellformed: hotel.wellformed() })
 
 }));
 
 app.put("/hotels/update/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
   const { tripId, splitId, hotelId } = req.params;
   const { info, checkIn, checkOut, location, rooms, metadata } = req.body;
-  await handleUpdateHotel(tripId,splitId, hotelId, info, checkIn, checkOut, location, rooms, metadata);
-  return res.status(200).json({})
+  const wellformed = await handleUpdateHotel(tripId,splitId, hotelId, info, checkIn, checkOut, location, rooms, metadata);
+  return res.status(200).json({wellformed: wellformed})
 }));
 
 app.delete("/hotels/remove/:tripId/:splitId/:hotelId", catchErrors (async (req:Request, res:Response) => {
