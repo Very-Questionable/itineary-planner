@@ -92,7 +92,7 @@ app.get(
   "/trips/:tripId",
   catchErrors(async (req: Request, res: Response) => {
     const { tripId } = req.params;
-    const trip = handleGetTrip(tripId);
+    const trip = await handleGetTrip(tripId);
     return res.status(200).json({ trip: trip, wellformed: trip.wellformed() });
   })
 );

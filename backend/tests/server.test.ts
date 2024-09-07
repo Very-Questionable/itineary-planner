@@ -51,6 +51,7 @@ const sendTry = async (
       ? req.put(path)
       : req.put(path);
   const response = await req2.send(payload);
+  console.log(response.body)
   expect(response.statusCode).toBe(status);
   return response.body;
 };
@@ -58,7 +59,7 @@ const sendTry = async (
 const startdate = new Date(Date.parse("2019-01-01"));
 const day2 = new Date(Date.parse("2019-01-02"));
 const day3 = new Date(Date.parse("2019-01-03"));
-// const day4 = new Date(Date.parse("2019-01-04"));
+const day4 = new Date(Date.parse("2019-01-04"));
 // const day5 = new Date(Date.parse("2019-01-04"));
 const endDate = new Date(Date.parse("2019-01-06"));
 
@@ -308,5 +309,70 @@ describe("Routes testing", () => {
     );
     expect(res3.room.capacity).toStrictEqual(2);
     expect(res3.room.price).toStrictEqual(200);
+  });
+
+
+  test("Day tests", async () => {
+    const { tripId } = await postTry("/trips/new", 200, {
+      info: "Hello",
+      start: startdate,
+      end: endDate,
+    });
+    
+    console.log(tripId)
+
+    const s1 = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Split1",
+      start: startdate,
+      end: day3,
+    });
+
+    const s2 = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Split2",
+      start: day3,
+      end: endDate,
+    });
+
+    console.log(s1,s2)
+    const d1 = await postTry(`/days/new/${tripId}/${s1.splitId}`, 200, {
+      info: "day1",
+      date: day2
+    });
+    
+    const d2 = await postTry(`/days/new/${tripId}/${s2.splitId}`, 200, {
+      info: "day2",
+      date: day4
+    });
+    const d3 = await postTry(`/days/new/${tripId}/${s2.splitId}`, 200, {
+      info: "day3",
+      date: day3
+    });
+    console.log(d1,d2,d3);
+
+    const allDays = await getTry(`/days/${tripId}`, 200, {});
+    const partialDays = await getTry(`/days/${tripId}/${s2.splitId}`, 200, {});
+
+    const day1Test = await getTry(`/days/${tripId}/${s1.splitId}/${d1.dayId}`, 200, {});
+    const day2Test = await getTry(`/days/${tripId}/${s2.splitId}/${d2.dayId}`, 200, {});
+    const day3Test = await getTry(`/days/${tripId}/${s2.splitId}/${d3.dayId}`, 200, {});
+    expect(allDays.days).toStrictEqual([day1Test.day,day3Test.day,day2Test.day]);
+    expect(partialDays.days).toStrictEqual([day3Test.day,day2Test.day]);
+
+
+    await putTry(`/days/update/${tripId}/${s2.splitId}/${d3.dayId}`, 200, {
+      info: "hello3",
+      date: endDate,
+      metadata: {hello: "world"}
+    });
+    const day3Updated = await getTry(`/days/${tripId}/${s2.splitId}/${d3.dayId}`, 200, {});
+    expect(day3Updated.day.info).toStrictEqual("hello3");
+    expect(day3Updated.day.metadata).toBeDefined();
+    expect(day3Updated.day.metadata).toStrictEqual({hello: "world"});
+    expect(Date.parse(day3Updated.day.date)).toStrictEqual(endDate.getTime());
+
+    await deleteTry(`/days/remove/${tripId}/${s2.splitId}/${d3.dayId}`, 200, {});
+    await getTry(`/days/${tripId}/${s2.splitId}/${d3.dayId}`, 403, {});
+    
+    
   });
 });

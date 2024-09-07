@@ -55,7 +55,7 @@ export default class TripSegment extends TripInfo {
     if (this.containsDay(day.id)) throw new AccessError("Day id already added");
     if (this.containsDate(day.date)) throw new InputError("Day already added");
     this.days.push(day);
-    this.days.sort((a, b) => a.date.getTime() - b.date.getTime());
+    this.days.sort((a, b) => (new Date(a.date)).getTime() - (new Date(b.date)).getTime());
   }
 
   /**
