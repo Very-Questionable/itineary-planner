@@ -121,6 +121,10 @@ export default class TripSegment extends TripInfo {
     return targetHotel.removePerson(roomId, personId);
   }
 
+  public updateDates(start?: Date, end?: Date) {
+    super.updateDates(start,end);
+    this.hotels.forEach(h => h.updateDates(start,end));
+  }
   /**
    * Wellformed if
    *  - Hotels account for all travelers

@@ -14,6 +14,8 @@ import {
   handleDeleteHotel,
   handleDeleteSplit,
   handleDeleteTrip,
+  handleGetDay,
+  handleGetDays,
   handleGetHotel,
   handleGetHotels,
   handleGetRoom,
@@ -21,7 +23,10 @@ import {
   handleGetSplit,
   handleGetSplits,
   handleGetTrip,
+  handleNewDay,
+  handleRemoveDay,
   handleRemoveRoom,
+  handleUpdateDay,
   handleUpdateHotel,
   handleUpdateRoom,
   handleUpdateSplit,
@@ -77,8 +82,8 @@ app.get(
 app.post(
   "/trips/new",
   catchErrors(async (req: Request, res: Response) => {
-    const { info, start, end, metadata } = req.body;
-    const newTrip = await handleCreateNewTrip(info, start, end, metadata);
+    const { info, start, end} = req.body;
+    const newTrip = await handleCreateNewTrip(info, start, end);
     return res.status(200).json({ tripId: newTrip });
   })
 );
@@ -96,15 +101,13 @@ app.put(
   "/trips/update/:tripId",
   catchErrors(async (req: Request, res: Response) => {
     const { tripId } = req.params;
-    const { info, start, end, travellers, splits, metadata } = req.body;
+    const { info, start, end, metadata } = req.body;
 
     const wellformed = await handleUpdateTrip(
       tripId,
       info,
       start,
       end,
-      travellers,
-      splits,
       metadata
     );
     return res.status(200).json({ wellformed: wellformed });
@@ -161,8 +164,8 @@ app.put(
   "/splits/update/:tripId/:splitId",
   catchErrors(async (req: Request, res: Response) => {
     const { tripId, splitId } = req.params;
-    const { info, start, end, hotels, days } = req.body;
-    await handleUpdateSplit(tripId, splitId, info, start, end, hotels, days);
+    const { info, start, end } = req.body;
+    await handleUpdateSplit(tripId, splitId, info, start, end);
     return res.status(200).json({});
   })
 );
@@ -237,7 +240,7 @@ app.put(
   "/hotels/update/:tripId/:splitId/:hotelId",
   catchErrors(async (req: Request, res: Response) => {
     const { tripId, splitId, hotelId } = req.params;
-    const { info, checkIn, checkOut, location, rooms, metadata } = req.body;
+    const { info, checkIn, checkOut, location, metadata } = req.body;
     const wellformed = await handleUpdateHotel(
       tripId,
       splitId,
@@ -246,7 +249,6 @@ app.put(
       checkIn,
       checkOut,
       location,
-      rooms,
       metadata
     );
     return res.status(200).json({ wellformed: wellformed });
@@ -311,7 +313,7 @@ app.put(
   "/rooms/update/:tripId/:splitId/:hotelId/:roomId",
   catchErrors(async (req: Request, res: Response) => {
     const { tripId, splitId, hotelId, roomId } = req.params;
-    const { info, checkIn, checkOut, price, capacity, persons, metadata } =
+    const { info, checkIn, checkOut, price, capacity, metadata } =
       req.body;
     const rooms = await handleUpdateRoom(
       tripId,
@@ -323,7 +325,6 @@ app.put(
       checkOut,
       price,
       capacity,
-      persons,
       metadata
     );
     return res.status(200).json({ rooms: rooms });
@@ -338,6 +339,53 @@ app.delete(
     return res.status(200).json({});
   })
 );
+/**
+ * 
+|/day/{tripId}/                                 |lists days                |GET    |
+|/day/{tripId}/{splitId}                        |list days in a split      |GET    |
+|/day/{tripId}/{splitId}                        |add a day to a split      |POST   |
+|/day/{tripId}/{splitId}/{dayId}                |Update a day              |PUT    |
+|/day/{tripId}/{splitId}/{dayId}                |Removes a day             |DELETE |
+*/
+
+app.get("/days/:tripId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  const days = await handleGetDays(tripId);
+  res.status(200).json({days: days});
+}))
+
+app.get("/days/:tripId/:splitId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId} = req.params
+  const days = await handleGetDays(tripId, splitId);
+  res.status(200).json({days: days});
+}))
+
+app.get("/days/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId} = req.params
+  const day = await handleGetDay(tripId, splitId, dayId);
+  res.status(200).json({day: day, wellformed: day.wellformed()});
+}))
+
+app.post("/days/new/:tripId/:splitId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId} = req.params;
+  const {info, date} = req.body;
+  const dayId = await handleNewDay(tripId, splitId, info, date);
+  res.status(200).json({dayId: dayId});
+}))
+
+app.put("/days/update/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId} = req.params;
+  const {info, date, metadata} = req.body;
+  const wellformed = await handleUpdateDay(tripId, splitId, dayId, info, date, metadata);
+  res.status(200).json({wellformed: wellformed});
+}))
+
+
+app.delete("/days/remove/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId} = req.params
+  await handleRemoveDay(tripId, splitId, dayId);
+  res.status(200).json({});
+}))
 
 /****************************************
  * Run Server
@@ -355,4 +403,5 @@ const server = app.listen(port, () => {
 });
 
 export default server;
+
 

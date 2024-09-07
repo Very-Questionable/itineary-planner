@@ -292,7 +292,7 @@ describe("Routes testing", () => {
       403,
       {}
     );
-
+    
     await putTry(
       `/rooms/update/${tripId}/${splitId}/${hotelId}/${r2.roomId}`,
       200,

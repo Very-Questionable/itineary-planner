@@ -78,7 +78,6 @@ export const handleCreateNewTrip = async (
   info: string,
   start: Date,
   end: Date,
-  metadata?: object
 ): Promise<string> => {
   return await lock.acquire("resourceLock", async () => {
     const newTrip = new Trip(
@@ -86,12 +85,8 @@ export const handleCreateNewTrip = async (
       info,
       start,
       end,
-      [],
-      [],
-      metadata
     );
     trips[newTrip.id] = newTrip;
-    await save();
     return newTrip.id;
   });
 };
@@ -106,24 +101,11 @@ export const handleUpdateTrip = async (
   info?: string,
   start?: Date,
   end?: Date,
-  travellers?: Array<Person>,
-  splits?: Array<TripSegment>,
   metadata?: object
 ): Promise<boolean> =>
   await lock.acquire("resourseLock", async () => {
-    const target = trips[tripId];
-    if (!target) throw new AccessError("Trip does not exist");
+    const target = getTrip(tripId);
     target.updateInfo(info, metadata);
-    if (travellers)
-      travellers.forEach((t: Person) => {
-        if (target.containsTraveller(t.id)) target.removeTraveller(t.id);
-        target.addTraveller(t);
-      });
-    if (splits)
-      splits.forEach((s: TripSegment) => {
-        if (target.containsSplit(s.id)) target.removeSplit(s.id);
-        target.addSplit(s);
-      });
     target.updateDates(start, end);
     trips[tripId] = target;
     return target.wellformed();
@@ -131,7 +113,7 @@ export const handleUpdateTrip = async (
 
 export const handleDeleteTrip = async (tripId: string) => {
   await lock.acquire("resourseLock", async () => {
-    if (!trips[tripId]) throw new AccessError("Trip does not exist");
+    getTrip(tripId);
     trips = Object.keys(trips)
       .filter((objKey) => objKey !== tripId)
       .reduce((newObj: TripMap, key: string) => {
@@ -156,8 +138,7 @@ export const handleCreateNewSplit = async (
   end: Date
 ): Promise<string> => {
   return await lock.acquire("resourseLock", async () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
+    const targetTrip = getTrip(tripId);
 
     const newSplit = new TripSegment(
       targetTrip.generateSplitId(),
@@ -173,8 +154,7 @@ export const handleCreateNewSplit = async (
 };
 
 export const handleGetSplits = (tripId: string): Array<TripSegment> => {
-  const targetTrip = trips[tripId];
-  if (!targetTrip) throw new AccessError("Trip does not exist");
+  const targetTrip = getTrip(tripId);
   return targetTrip.splits;
 };
 
@@ -182,11 +162,7 @@ export const handleGetSplit = (
   tripId: string,
   splitId: string
 ): TripSegment => {
-  const targetTrip = trips[tripId];
-  if (!targetTrip) throw new AccessError("Trip does not exist");
-  if (!targetTrip.containsSplit(splitId))
-    throw new AccessError("Split does not exist");
-  return targetTrip.getSplit(splitId)!;
+  return getSplit(tripId, splitId);
 };
 
 export const handleUpdateSplit = async (
@@ -196,8 +172,6 @@ export const handleUpdateSplit = async (
   start: Date,
   end: Date,
   metadata?: object,
-  hotels?: Array<Hotel>,
-  days?: Array<Day>
 ): Promise<boolean> =>
   await lock.acquire("resourseLock", () => {
     const targetTrip = trips[tripId];
@@ -215,33 +189,19 @@ export const handleUpdateSplit = async (
         targetSplit.addTraveller(t);
       });
 
-    if (hotels)
-      hotels.forEach((h: Hotel) => {
-        if (targetSplit.containsHotel(h.id)) targetSplit.removeHotel(h.id);
-        targetSplit.addHotel(h);
-      });
-    if (days)
-      days.forEach((d: Day) => {
-        if (targetSplit.containsDay(d.id)) targetSplit.removeDay(d.id);
-        targetSplit.addDay(d);
-      });
     return targetSplit.wellformed();
   });
 
 export const handleDeleteSplit = async (tripId: string, splidId: string) => {
   await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
+    const targetTrip = getTrip(tripId);
     targetTrip.removeSplit(splidId);
   });
 };
 
 export const handleGetHotels = async (tripId: string, splitId: string) => {
   return await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
-    const targetSplit = targetTrip.getSplit(splitId);
-    if (!targetSplit) throw new AccessError("Split does not exist");
+    const targetSplit = getSplit(tripId,splitId);
     return targetSplit.hotels;
   });
 };
@@ -252,13 +212,8 @@ export const handleGetHotel = async (
   hotelId: string
 ): Promise<Hotel> =>
   await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
-    const targetSplit = targetTrip.getSplit(splitId);
-    if (!targetSplit) throw new AccessError("Split does not exist");
-    const targetHotel = targetSplit.getHotel(hotelId);
-    if (!targetHotel) throw new AccessError("Hotel does not exist");
-    return targetHotel;
+    const hotel = getHotel(tripId, splitId, hotelId);
+    return hotel;
   });
 
 export const handleCreateNewHotel = async (
@@ -270,10 +225,7 @@ export const handleCreateNewHotel = async (
   location: string
 ): Promise<string> => {
   return await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
-    const targetSplit = targetTrip.getSplit(splitId);
-    if (!targetSplit) throw new AccessError("Split does not exist");
+    const targetSplit = getSplit(tripId, splitId);
     const newHotel = new Hotel(
       targetSplit.generateHotelId(),
       info,
@@ -293,26 +245,14 @@ export const handleUpdateHotel = async (
   checkIn?: Date,
   checkOut?: Date,
   location?: string,
-  rooms?: Array<Room>,
   metadata?: object
 ): Promise<boolean> => {
   return await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
-    const targetSplit = targetTrip.getSplit(splitId);
-    if (!targetSplit) throw new AccessError("Split does not exist");
-    const targetHotel = targetSplit.getHotel(hotelId);
-    if (!targetHotel) throw new AccessError("Hotel does not exist");
+    const targetHotel = getHotel(tripId,splitId,hotelId);
     targetHotel.updateInfo(info, metadata);
     targetHotel.updateDates(checkIn, checkOut);
 
     targetHotel.location = location ? location : targetHotel.location;
-
-    if (rooms)
-      rooms.forEach((r: Room) => {
-        if (targetHotel.containsRoom(r.id)) targetHotel.removeRoom(r.id);
-        targetHotel.addRoom(r);
-      });
 
     return targetHotel.wellformed();
   });
@@ -324,8 +264,7 @@ export const handleDeleteHotel = async (
   hotelId: string
 ) => {
   await lock.acquire("resourseLock", () => {
-    const targetTrip = trips[tripId];
-    if (!targetTrip) throw new AccessError("Trip does not exist");
+    const targetTrip = getTrip(tripId);
     targetTrip.removeHotel(splitId, hotelId);
   });
 };
@@ -339,12 +278,7 @@ export const handleCreateNewRoom = async (
   capacity: number
 ): Promise<string> =>
   await lock.acquire("resourseLock", () => {
-    const trip = trips[tripId];
-    if (!trip) throw new AccessError("Trip does not exist");
-    const split = trip.getSplit(splitId);
-    if (!split) throw new AccessError("Split does not exist");
-    const hotel = split.getHotel(hotelId);
-    if (!hotel) throw new AccessError("Hotel does not exist");
+    const hotel = getHotel(tripId,splitId,hotelId);
     const newRoom = new Room(
       hotel.generateRoomId(),
       info,
@@ -363,12 +297,7 @@ export const handleGetRooms = async (
   hotelId: string
 ): Promise<Array<Room>> => {
   return await lock.acquire("resourseLock", () => {
-    const trip = trips[tripId];
-    if (!trip) throw new AccessError("Trip does not exist");
-    const split = trip.getSplit(splitId);
-    if (!split) throw new AccessError("Split does not exist");
-    const hotel = split.getHotel(hotelId);
-    if (!hotel) throw new AccessError("Hotel does not exist");
+    const hotel = getHotel(tripId,splitId,hotelId);
     return hotel.rooms;
   });
 };
@@ -378,18 +307,8 @@ export const handleGetRoom = async (
   splitId: string,
   hotelId: string,
   roomId: string
-) => {
-  return await lock.acquire("resourseLock", () => {
-    const trip = trips[tripId];
-    if (!trip) throw new AccessError("Trip does not exist");
-    const split = trip.getSplit(splitId);
-    if (!split) throw new AccessError("Split does not exist");
-    const hotel = split.getHotel(hotelId);
-    if (!hotel) throw new AccessError("Hotel does not exist");
-    const room = hotel.getRoom(roomId);
-    if (!room) throw new AccessError("Room does not exist");
-    return room;
-  });
+): Promise<Room> => {
+  return await lock.acquire("resourseLock", () => getRoom(tripId, splitId, hotelId, roomId));
 };
 
 export const handleUpdateRoom = async (
@@ -402,28 +321,14 @@ export const handleUpdateRoom = async (
   checkOut?: Date,
   price?: number,
   capacity?: number,
-  persons?: Array<Person>,
   metadata?: object
 ) => {
   return await lock.acquire("resourseLock", () => {
-    const trip = trips[tripId];
-    if (!trip) throw new AccessError("Trip does not exist");
-    const split = trip.getSplit(splitId);
-    if (!split) throw new AccessError("Split does not exist");
-    const hotel = split.getHotel(hotelId);
-    if (!hotel) throw new AccessError("Hotel does not exist");
-    const room = hotel.getRoom(roomId);
-    if (!room) throw new AccessError("Room does not exist");
-
+    const room = getRoom(tripId, splitId, hotelId, roomId);
     room.updateInfo(info, metadata);
     room.updateDates(checkIn, checkOut);
     room.updatePrice(price, capacity);
 
-    if (persons)
-      persons.forEach((p: Person) => {
-        if (room.containsPerson(p.id)) room.removePerson(p.id);
-        room.addPerson(p);
-      });
     return room.wellformed();
   });
 };
@@ -435,12 +340,81 @@ export const handleRemoveRoom = async (
   roomId: string
 ) => {
   return await lock.acquire("resourseLock", () => {
-    const trip = trips[tripId];
-    if (!trip) throw new AccessError("Trip does not exist");
-    const split = trip.getSplit(splitId);
-    if (!split) throw new AccessError("Split does not exist");
-    const hotel = split.getHotel(hotelId);
-    if (!hotel) throw new AccessError("Hotel does not exist");
+    const hotel = getHotel(tripId,splitId, hotelId);
     hotel.removeRoom(roomId);
   });
 };
+
+export const handleGetDays = async (tripId: string, splitId?: string): Promise<Array<Day>> => {
+  return await lock.acquire("resourseLock", () => {
+    return (splitId) ? getSplit(tripId,splitId).days : getTrip(tripId).listDays();
+  })
+    
+}
+
+export const handleGetDay = async (tripId: string, splitId: string, dayId: string): Promise<Day> => {
+  return await lock.acquire("resourseLock", () => {
+    return getDay(tripId,splitId,dayId);
+  })
+}
+
+export const handleNewDay = async (tripId: string, splitId: string, info: string, date: Date): Promise<string> => {
+  return await lock.acquire("resourseLock", () => {
+    const split = getSplit(tripId,splitId);
+    const newDay = new Day(split.generateDayId(),info,date);
+    split.addDay(newDay);
+    return newDay.id;
+  })
+}
+
+export const handleUpdateDay = async (tripId: string, splitId: string, dayId: string, info: string, date: Date, metadata: object): Promise<boolean> => {
+  return await lock.acquire("resourseLock", () => {
+    const day = getDay(tripId,splitId,dayId);
+    day.updateInfo(info, metadata);
+    if (date) day.date = date;
+    return day.wellformed();
+  })
+}
+
+export const handleRemoveDay = async (tripId: string, splitId: string, dayId: string): Promise<void> => {
+  await lock.acquire("resourseLock", () => {
+    const split = getSplit(tripId,splitId);
+    split.removeDay(dayId);
+  })
+}
+
+
+const getTrip = (tripId: string): Trip => {
+  const trip = trips[tripId];
+  if (!trip) throw new AccessError("Trip does not exist");
+  return trip;
+};
+
+const getSplit = (tripId: string, splitId: string): TripSegment => {
+  const trip = getTrip(tripId);
+  const split = trip.getSplit(splitId);
+  if (!split) throw new AccessError("Split does not exist");
+  return split;
+};
+
+
+const getHotel = (tripId: string, splitId: string, hotelId: string): Hotel => {
+  const split = getSplit(tripId, splitId);
+  const hotel = split.getHotel(hotelId);
+  if (!hotel) throw new AccessError("Hotel does not exist");
+  return hotel;
+};
+
+const getRoom = (tripId: string, splitId: string, hotelId: string, roomId: string): Room => {
+  const hotel = getHotel(tripId, splitId, hotelId);
+  const room = hotel.getRoom(roomId);
+  if (!room) throw new AccessError("Room does not exist");
+  return room;
+};
+
+const getDay = (tripId: string, splitId: string, dayId: string): Day => {
+  const split = getSplit(tripId, splitId);
+  const day = split.getDay(dayId)
+  if (!day) throw new AccessError ("Day does not exist");
+  return day;
+}
