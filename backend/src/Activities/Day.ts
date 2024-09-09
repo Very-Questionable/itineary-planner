@@ -30,12 +30,6 @@ export default class Day extends Info {
     return genId;
   }
 
-  public generateActivityId(): string {
-    let genId = "Activity" + Info.generateId();
-    while(this.containsItineary(genId)) genId = "Activity" + Info.generateId();
-    return genId;
-
-  }
 
   public containsActivity(id: string): boolean {
     return this.itinearies.flatMap(it => it.listActivities()).some(act => act.id === id);

@@ -18,6 +18,13 @@ export default class SplitDayItineary extends Itineary {
     this.night = activities.night ? activities.night : [];
   }
 
+  public updateActivities(activities?: Activities) {
+    if (!activities) return;
+    this.morning = activities.morning ? activities.morning : this.morning;
+    this.afternoon = activities.afternoon ? activities.afternoon : this.afternoon;
+    this.night = activities.night ? activities.night : this.night;
+  }
+  
   isFreeDay(): boolean {
     return false;
   }

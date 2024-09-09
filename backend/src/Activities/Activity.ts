@@ -4,7 +4,7 @@
  */
 
 export default interface Activity {
-  id: string
+  id?: string
   name: string,
   info: string,
   location: string,
@@ -17,6 +17,5 @@ export interface Activities {
   morning?: Array<Activity>;
   afternoon?: Array<Activity>;
   night?: Array<Activity>;
-  metadata?: object
 }
 

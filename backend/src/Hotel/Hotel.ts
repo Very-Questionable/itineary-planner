@@ -91,6 +91,12 @@ export default class Hotel extends HotelInfo {
     return target;
   }
 
+
+  public updateDates(start?: Date, end?: Date) {
+    super.updateDates(start,end);
+    this.rooms.forEach(r => r.updateDates(start,end));
+  }
+
   /**
    * In a hotel
    *  - CheckIn and CheckOut Days must match

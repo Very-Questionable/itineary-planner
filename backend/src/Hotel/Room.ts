@@ -23,6 +23,11 @@ export default class Room extends HotelInfo {
     this.persons = persons ? persons! : [];
   }
 
+  public updatePrice(price?: number, capacity?: number) {
+    this.price = price ? price : this.price;
+    this.capacity = capacity ? capacity : this.capacity
+  }
+  
   /**
    * addPerson
    */

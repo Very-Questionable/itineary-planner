@@ -27,6 +27,12 @@ export default class Trip extends TripInfo {
     while(this.containsSplit(genId)) genId = "split" + Info.generateId();
     return genId;
   }
+  
+  public generateTravellerId(): string {
+    let genId = "Traveller" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "Traveller" + Info.generateId();
+    return genId;
+  }
 
   /**
    * add split: Adds a trip segment to a split
@@ -118,7 +124,7 @@ export default class Trip extends TripInfo {
   public listDays(): Array<Day> {
     const unique = new Set(this.splits.flatMap((s) => s.days));
     const target = Array.from(unique).sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
+      (a, b) => (new Date(a.date)).getTime() - (new Date(b.date)).getTime()
     );
     return target;
   }

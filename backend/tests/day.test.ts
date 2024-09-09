@@ -28,7 +28,6 @@ const mySplitItineary = new SplitDayItineary("2","Split day",myActivities);
 const myWholeItineary = new WholeDayItineary("3", "Whole day", myActivity)
 describe("Day tests", () => {
   test("Compiles",() => {
-    // const validBooked = new Hotel("1","myRoom", new Date(Date.parse("2019-01-01")), new Date(Date.parse("2019-01-04")),"Here",[singleRoom, singleRoom3]);
     const myDay = new Day("1","1",new Date(Date.parse("2019-01-01")))
     expect(myDay).toBeDefined();
   });
