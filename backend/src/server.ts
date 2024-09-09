@@ -1,10 +1,10 @@
-import express, { Request, Response } from "express";
-import swaggerUi from "swagger-ui-express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import express, { Request, Response } from "express";
 import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
 import swaggerDoc from "../swagger.json";
-import { InputError, AccessError } from "./Error/error.js";
+import { AccessError, InputError } from "./Error/error.js";
 import {
   getTrips,
   handleCreateNewHotel,
@@ -18,16 +18,21 @@ import {
   handleGetDays,
   handleGetHotel,
   handleGetHotels,
+  handleGetItinearies,
+  handleGetItineary,
   handleGetRoom,
   handleGetRooms,
   handleGetSplit,
   handleGetSplits,
   handleGetTrip,
   handleNewDay,
+  handleNewItineary,
   handleRemoveDay,
+  handleRemoveItineary,
   handleRemoveRoom,
   handleUpdateDay,
   handleUpdateHotel,
+  handleUpdateItineary,
   handleUpdateRoom,
   handleUpdateSplit,
   handleUpdateTrip,
@@ -387,6 +392,39 @@ app.delete("/days/remove/:tripId/:splitId/:dayId", catchErrors(async (req:Reques
   res.status(200).json({});
 }))
 
+app.get("/itinearies/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId} = req.params;
+  const itinearies = await handleGetItinearies(tripId,splitId,dayId);
+  res.status(200).json({itinearies: itinearies });
+}));
+
+app.get("/itinearies/:tripId/:splitId/:dayId/:itineariesId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId, itineariesId} = req.params;
+  const itineary = await handleGetItineary(tripId,splitId,dayId, itineariesId);
+  res.status(200).json({itineary: itineary, itinearyType: itineary.constructor.name });
+}));
+
+app.post("/itinearies/new/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId} = req.params;
+  const {info, itinearyType, activityPayload} = req.body;
+  const itinearyId = await handleNewItineary(tripId,splitId,dayId, info, itinearyType, activityPayload);
+  res.status(200).json({itinearyId: itinearyId });
+}));
+
+app.put("/itinearies/update/:tripId/:splitId/:dayId/:itinearyId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId, itinearyId} = req.params;
+  const {info, activityPayload, metadata} = req.body;
+  console.log(req.body)
+  const wellformed = await handleUpdateItineary(tripId, splitId, dayId, itinearyId, info, activityPayload, metadata);
+  res.status(200).json({ wellformed: wellformed });
+}));
+
+app.delete("/itinearies/remove/:tripId/:splitId/:dayId/:itinearyId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, dayId, itinearyId} = req.params;
+  await handleRemoveItineary(tripId, splitId, dayId, itinearyId);
+  res.status(200).json({});
+}));
+
 /****************************************
  * Run Server
  *****************************************/
@@ -403,5 +441,6 @@ const server = app.listen(port, () => {
 });
 
 export default server;
+
 
 

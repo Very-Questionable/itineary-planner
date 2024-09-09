@@ -62,6 +62,10 @@ classDiagram
 |/activity/{tripId}/{splitId}/{dayId}           |Post an activity          |POST   |
 |/activity/{tripId}/{splitId}/{dayId}/{activityId} |updates an activity    |PUT    |
 |/activity/{tripId}/{splitId}/{dayId}/{activityId} |deletes an activity    |DELETE |
+|/itineary/{tripId}/{splitId}/{dayId}           |Lists activities          |GET    |
+|/itineary/{tripId}/{splitId}/{dayId}           |Post an activity          |POST   |
+|/itineary/{tripId}/{splitId}/{dayId}/{activityId} |updates an activity    |PUT    |
+|/itineary/{tripId}/{splitId}/{dayId}/{activityId} |deletes an activity    |DELETE |
 
 
 

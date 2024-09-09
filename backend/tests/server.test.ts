@@ -1,5 +1,6 @@
 import request from "supertest";
 import server from "../src/server.js";
+import Activity, { Activities } from "../src/Activities/Activity.js";
 
 const postTry = async (
   path: string,
@@ -374,5 +375,83 @@ describe("Routes testing", () => {
     await getTry(`/days/${tripId}/${s2.splitId}/${d3.dayId}`, 403, {});
     
     
+  });
+
+
+  test("Itinearies", async () => {
+    const myActivity: Activity = {
+      id:"1",name:"nabewari",info:"udon",location:"nabewari"
+    }
+    const myActivity2: Activity = {
+      id:"2",name:"deer",info:"shikanokonokonokokoshitantan",location:"nara"
+    }
+
+    const myActivity3: Activity = {
+      id:"3",name:"deer",info:"shikanokonokonokokoshitantan",location:"nara"
+    }
+    const myActivity4: Activity = {
+      id:"4",name:"deer",info:"shikanokonokonokokoshitantan",location:"nara"
+    }
+    const myActivities: Activities = {
+      morning: [myActivity],
+      afternoon: [myActivity2, myActivity3, myActivity4]
+    }
+    const { tripId } = await postTry("/trips/new", 200, {
+      info: "Hello",
+      start: startdate,
+      end: endDate,
+    });
+    
+    console.log(tripId)
+
+    const {splitId} = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Split1",
+      start: startdate,
+      end: day3,
+    });
+
+    const {dayId} = await postTry(`/days/new/${tripId}/${splitId}`, 200, {
+      info: "day1",
+      date: startdate
+    });
+
+    const freeDay = await postTry(`/itinearies/new/${tripId}/${splitId}/${dayId}`, 200, {
+      info: "Free Day",
+      itinearyType: "FreeDayItineary"
+    });
+
+    const wholeDay = await postTry(`/itinearies/new/${tripId}/${splitId}/${dayId}`, 200, {
+      info: "whole Day",
+      itinearyType: "WholeDayItineary",
+      activityPayload: { activity: myActivity}
+    });
+    
+    const splitDay = await postTry(`/itinearies/new/${tripId}/${splitId}/${dayId}`, 200, {
+      info: "split Day",
+      itinearyType: "SplitDayItineary",
+      activityPayload: { activities: myActivities}
+    });
+
+    console.log(freeDay, wholeDay, splitDay);
+
+    const {itinearies} = await getTry(`/itinearies/${tripId}/${splitId}/${dayId}`, 200, {});
+    const freeDetail = await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${freeDay.itinearyId}`, 200, {});
+    const wholeDetail = await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${wholeDay.itinearyId}`, 200, {});
+    const splitDetail = await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 200, {});
+    
+    expect(itinearies).toStrictEqual([freeDetail.itineary, wholeDetail.itineary, splitDetail.itineary])
+    expect(freeDetail.itinearyType).toStrictEqual("FreeDayItineary"); 
+    expect(splitDetail.itinearyType).toStrictEqual("SplitDayItineary"); 
+    expect(wholeDetail.itinearyType).toStrictEqual("WholeDayItineary"); 
+    myActivities.afternoon?.pop();
+
+    await putTry(`/itinearies/update/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 200, {
+      activityPayload: {activities: myActivities}
+    });
+    const newSplit = await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 200, {});
+    expect(newSplit.itineary.afternoon).toStrictEqual([myActivity2,myActivity3]);
+
+    await deleteTry(`/itinearies/remove/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 200, {});
+    await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 403, {});
   });
 });

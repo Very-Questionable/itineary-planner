@@ -188,8 +188,6 @@ describe("TripSegment Wellformed", () => {
       myDays
     );
     expect(testSegment.wellformed()).toBeTruthy();
-    // console.log(testSegment);
-    // console.log(JSON.stringify(testSegment));
   });
 
   test("Days wellformedness", () => {

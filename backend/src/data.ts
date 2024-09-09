@@ -4,15 +4,24 @@ import Info from "./Info.js";
 import AsyncLock from "async-lock";
 import TripSegment from "./Trip/TripSegment.js";
 import Person from "./Hotel/Person.js";
-import { AccessError } from "./Error/error.js";
+import { AccessError, InputError } from "./Error/error.js";
 import Hotel from "./Hotel/Hotel.js";
 import Day from "./Activities/Day.js";
 import Room from "./Hotel/Room.js";
+import FreeDayItineary from "./Activities/FreeDayItineary.js";
+import SplitDayItineary from "./Activities/SplitDayItineary.js";
+import WholeDayItineary from "./Activities/WholeDayItineary.js";
+import Activity, { Activities } from "./Activities/Activity.js";
 
 export interface TripMap {
   [key: string]: Trip;
 }
+
+export interface UserMap {
+  [key: string]: Person;
+}
 let trips: TripMap = {};
+
 const DATABASE_PATH = "./database.json";
 
 const lock = new AsyncLock();
@@ -34,7 +43,6 @@ export const update = async (trips: TripMap) => {
 export const getTrips = (): TripMap => trips;
 
 export const save = () => update(trips);
-
 
 export const generateTripId = (): string => {
   let genId = "Trip" + Info.generateId();
@@ -75,7 +83,7 @@ export const handleCreateNewTrip = async (
 export const handleGetTrip = async (tripId: string): Promise<Trip> => {
   return await lock.acquire("resourseLock", () => {
     return getTrip(tripId);
-  })
+  });
 };
 
 export const handleUpdateTrip = async (
@@ -391,6 +399,87 @@ export const handleRemoveDay = async (
   });
 };
 
+export const handleGetItinearies = async (
+  tripId: string,
+  splitId: string,
+  dayId: string
+) => {
+  return await lock.acquire("resourseLock", () => {
+    const day = getDay(tripId,splitId,dayId);
+    return day.itinearies;
+  });
+};
+
+export const handleGetItineary = async (
+  tripId: string,
+  splitId: string,
+  dayId: string,
+  itinearyId: string
+) => {
+  return await lock.acquire("resourseLock", () => {
+    return getItineary(tripId,splitId,dayId,itinearyId);
+  });
+ 
+};
+
+interface ActivityPayload {
+  activities?: Activities;
+  activity?: Activity;
+}
+
+export const handleNewItineary = async (
+  tripId: string,
+  splitId: string,
+  dayId: string,
+  info: string,
+  itinearyType: string,
+  activityPayload: ActivityPayload
+  
+): Promise<string> => {
+  return await lock.acquire("resourseLock", () => {
+    const day = getDay(tripId,splitId,dayId);
+    console.log(itinearyType);
+    const newIt = (itinearyType === "FreeDayItineary") ? new FreeDayItineary(day.generateItinearyId(), info)
+                : (itinearyType === "SplitDayItineary") ? new SplitDayItineary(day.generateItinearyId(), info, activityPayload.activities!)
+                : (itinearyType === "WholeDayItineary") ? new WholeDayItineary(day.generateItinearyId(), info, activityPayload.activity!)
+                : undefined;
+    if (!newIt) throw new InputError("Itinerary Type is Undefined");
+    day.addItineary(newIt);
+    return newIt.id;
+  })
+};
+
+export const handleUpdateItineary = async (
+tripId: string, splitId: string, dayId: string, itinearyId: string, info?: string, activityPayload?: ActivityPayload, metadata?: object): Promise<boolean> => {
+  return await lock.acquire("resourseLock", () => {
+    const it = getItineary(tripId,splitId,dayId,itinearyId);
+    it.updateInfo(info,metadata);
+    if (activityPayload) {
+      if (it instanceof WholeDayItineary) it.updateActivity(activityPayload.activity); 
+      if (it instanceof SplitDayItineary) it.updateActivities(activityPayload.activities); 
+    }
+    return it.wellformed();
+  });
+};
+
+export const handleRemoveItineary = async (
+  tripId: string,
+  splitId: string,
+  dayId: string,
+  itinearyId: string
+) => {
+  return await lock.acquire("resourseLock", () => {
+    const day = getDay(tripId,splitId,dayId);
+    day.removeItineary(itinearyId);
+  })  
+};
+
+/**
+ * Helper functions, Wrapper for obtaining trips
+ * @param tripId 
+ * @returns 
+ */
+
 const getTrip = (tripId: string): Trip => {
   const trip = trips[tripId];
   if (!trip) throw new AccessError("Trip does not exist");
@@ -429,3 +518,10 @@ const getDay = (tripId: string, splitId: string, dayId: string): Day => {
   if (!day) throw new AccessError("Day does not exist");
   return day;
 };
+
+const getItineary = (tripId:string, splitId: string, dayId: string, itinearyId: string) => {
+  const day = getDay(tripId,splitId,dayId);
+  const itineary = day.getItineary(itinearyId);
+  if (!itineary) throw new AccessError("Itineary does not exist");
+  return itineary;
+}
