@@ -23,12 +23,6 @@ export default class Hotel extends HotelInfo {
     this.rooms = rooms ? rooms! : [];
   }
 
-  public generateRoomId(): string {
-    let genId = "Room" + Info.generateId();
-    while(this.containsRoom(genId)) genId = "Room" + Info.generateId();
-    return genId;
-  }
-
   /**
    * addPerson
    */
@@ -39,10 +33,6 @@ export default class Hotel extends HotelInfo {
     }
 
     target.addPerson(person);
-  }
-
-  public listPersons(): Array<Person> {
-    return this.rooms.flatMap((room) => room.persons);
   }
 
   /**
@@ -68,8 +58,18 @@ export default class Hotel extends HotelInfo {
     return this.rooms.some((room) => room.id === id);
   }
 
+  public generateRoomId(): string {
+    let genId = "Room" + Info.generateId();
+    while(this.containsRoom(genId)) genId = "Room" + Info.generateId();
+    return genId;
+  }
+
   public getRoom(id: string): Room | undefined {
     return this.rooms.find((room) => room.id === id);
+  }
+
+  public listPersons(): Array<Person> {
+    return this.rooms.flatMap((room) => room.persons);
   }
 
   public removePerson(roomId: string, personId: string): Person {

@@ -8,7 +8,7 @@ import TripSegment from "./TripSegment.js";
 
 export default class Trip extends TripInfo {
   splits: Array<TripSegment>;
-
+  
   constructor(
     id: string,
     info: string,
@@ -20,6 +20,35 @@ export default class Trip extends TripInfo {
   ) {
     super(id, info, start, end, travellers, metadata);
     this.splits = splits ? splits! : [];
+  }
+
+  /**
+   * Checks if a split is overlapping with the rest of the splits beyond allowed leyway
+   * @param split
+   * @returns
+   */
+  private isOverlapping(split: TripSegment): boolean {
+    return this.splits.some(
+      (s) =>
+        s.end > split.start &&
+        split.end > s.start
+    );
+  }
+
+  public addTraveller(traveller: Person): void {
+    super.addTraveller(traveller);
+    this.splits.forEach(s => s.addTraveller(traveller));
+  }
+
+  public removeTraveller(id: string): Person {
+    const target = super.removeTraveller(id);
+    this.splits.forEach(s => s.removeTraveller(id));
+    return target
+  }
+  
+  public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
+    super.updateTraveller(travellerId, name, requireBooking, metadata)
+    this.splits.forEach(s => s.updateTraveller(travellerId,name,requireBooking,metadata))
   }
 
   public generateSplitId(): string {
@@ -53,19 +82,6 @@ export default class Trip extends TripInfo {
       ? (new Date(a.start)).getTime() - (new Date(b.start)).getTime()
       : (new Date(a.end)).getTime() - (new Date(b.end)).getTime()
     
-    );
-  }
-
-  /**
-   * Checks if a split is overlapping with the rest of the splits beyond allowed leyway
-   * @param split
-   * @returns
-   */
-  private isOverlapping(split: TripSegment): boolean {
-    return this.splits.some(
-      (s) =>
-        s.end > split.start &&
-        split.end > s.start
     );
   }
 

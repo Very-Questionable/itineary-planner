@@ -7,6 +7,7 @@ import swaggerDoc from "../swagger.json";
 import { AccessError, InputError } from "./Error/error.js";
 import {
   getTrips,
+  handleAssignRoom,
   handleCreateNewHotel,
   handleCreateNewRoom,
   handleCreateNewSplit,
@@ -24,17 +25,23 @@ import {
   handleGetRooms,
   handleGetSplit,
   handleGetSplits,
+  handleGetTraveller,
+  handleGetTravellers,
   handleGetTrip,
   handleNewDay,
   handleNewItineary,
+  handleNewTraveller,
   handleRemoveDay,
   handleRemoveItineary,
   handleRemoveRoom,
+  handleRemoveTraveller,
+  handleUnassignRoom,
   handleUpdateDay,
   handleUpdateHotel,
   handleUpdateItineary,
   handleUpdateRoom,
   handleUpdateSplit,
+  handleUpdateTraveller,
   handleUpdateTrip,
   reset,
   save,
@@ -392,6 +399,9 @@ app.delete("/days/remove/:tripId/:splitId/:dayId", catchErrors(async (req:Reques
   res.status(200).json({});
 }))
 
+/**
+ * Itinearies and Activities
+ */
 app.get("/itinearies/:tripId/:splitId/:dayId", catchErrors(async (req:Request, res:Response) => {
   const {tripId, splitId, dayId} = req.params;
   const itinearies = await handleGetItinearies(tripId,splitId,dayId);
@@ -425,6 +435,55 @@ app.delete("/itinearies/remove/:tripId/:splitId/:dayId/:itinearyId", catchErrors
   res.status(200).json({});
 }));
 
+/**
+ * Travellers
+ */
+
+app.get("/travellers/:tripId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  const travellers = await handleGetTravellers(tripId);
+  res.status(200).json({travellers: travellers });
+}));
+
+app.get("/travellers/:tripId/:travellerId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, travellerId} = req.params;
+  const traveller = await handleGetTraveller(tripId, travellerId);
+  res.status(200).json({traveller: traveller });
+}));
+
+app.post("/travellers/new/:tripId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId} = req.params;
+  const {name, requireBooking, metadata} = req.body;
+  const travellerId = await handleNewTraveller(tripId, name, requireBooking, metadata);
+  res.status(200).json({travellerId: travellerId });
+}));
+
+
+app.put("/travellers/update/:tripId/:travellerId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, travellerId} = req.params;
+  const {name, requireBooking, metadata} = req.body;
+  const wellformed = await handleUpdateTraveller(tripId, travellerId, name, requireBooking, metadata);
+  res.status(200).json({wellformed: wellformed});
+}));
+
+app.delete("/travellers/remove/:tripId/:travellerId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, travellerId} = req.params;
+  const wellformed = await handleRemoveTraveller(tripId, travellerId);
+  res.status(200).json({wellformed: wellformed});
+}));
+
+app.post("/rooms/:tripId/:splitId/:hotelId/:room/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, hotelId, roomId, travellerId} = req.params;
+  const wellformed = await handleAssignRoom(tripId,splitId,hotelId,roomId, travellerId)
+  res.status(200).json({wellformed: wellformed})
+}))
+
+app.delete("/rooms/:tripId/:splitId/:hotelId/:room/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
+  const {tripId, splitId, hotelId, roomId, travellerId} = req.params;
+  await handleUnassignRoom(tripId,splitId,hotelId,roomId, travellerId)
+  res.status(200).json({});
+}))
+
 /****************************************
  * Run Server
  *****************************************/
@@ -441,6 +500,7 @@ const server = app.listen(port, () => {
 });
 
 export default server;
+
 
 
 

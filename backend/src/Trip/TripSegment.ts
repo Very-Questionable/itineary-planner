@@ -25,28 +25,8 @@ export default class TripSegment extends TripInfo {
       : [];
   }
 
-  public generateHotelId(): string {
-    let genId = "Hotel" + Info.generateId();
-    while(this.containsHotel(genId)) genId = "Hotel" + Info.generateId();
-    return genId;
-  }
-
-  public generateDayId(): string {
-    let genId = "Day" + Info.generateId();
-    while(this.containsDay(genId)) genId = "Day" + Info.generateId();
-    return genId;
-  }
-
   private containsDate(date: Date): boolean {
     return this.days.some((day) => day.date === date);
-  }
-
-  public containsDay(id: string): boolean {
-    return this.days.some((day) => day.id === id);
-  }
-
-  public getDay(id: string): Day | undefined {
-    return this.days.find((day) => day.id === id);
   }
 
   public addDay(day: Day) {
@@ -83,8 +63,28 @@ export default class TripSegment extends TripInfo {
     targetHotel.addPerson(roomId, targetTraveller);
   }
 
+  public containsDay(id: string): boolean {
+    return this.days.some((day) => day.id === id);
+  }
+
   public containsHotel(id: string): boolean {
     return this.hotels.some((hotel) => hotel.id === id);
+  }
+
+  public generateDayId(): string {
+    let genId = "Day" + Info.generateId();
+    while(this.containsDay(genId)) genId = "Day" + Info.generateId();
+    return genId;
+  }
+
+  public generateHotelId(): string {
+    let genId = "Hotel" + Info.generateId();
+    while(this.containsHotel(genId)) genId = "Hotel" + Info.generateId();
+    return genId;
+  }
+
+  public getDay(id: string): Day | undefined {
+    return this.days.find((day) => day.id === id);
   }
 
   public getHotel(id: string): Hotel | undefined {
@@ -108,6 +108,16 @@ export default class TripSegment extends TripInfo {
     return target;
   }
 
+  public removeTraveller(id: string): Person {
+    const target = super.removeTraveller(id);
+    this.hotels.forEach(h => {
+      h.rooms.forEach(r => {
+        if (r.containsPerson(id)) r.removePerson(id);
+      })
+    });
+    return target;
+  }
+
   public unassignRoom(
     hotelId: string,
     roomId: string,
@@ -125,6 +135,19 @@ export default class TripSegment extends TripInfo {
     super.updateDates(start,end);
     this.hotels.forEach(h => h.updateDates(start,end));
   }
+
+  public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
+    super.updateTraveller(travellerId, name, requireBooking,metadata);
+    this.hotels.forEach(h => h.rooms.forEach(r => {
+      const person = r.getPerson(travellerId);
+      if (person) {
+        if (name) person.name = name;
+        person.requireBooking = requireBooking;
+        if (metadata) person.metadata = metadata;
+      }
+    }))
+  }
+
   /**
    * Wellformed if
    *  - Hotels account for all travelers

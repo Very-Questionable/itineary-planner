@@ -23,28 +23,27 @@ export default class Day extends Info {
       throw new AccessError("Itineary already added");
     this.itinearies.push(itineary);
   }
-  
+
+  public containsActivity(id: string): boolean {
+    return this.itinearies.flatMap(it => it.listActivities()).some(act => act.id === id);
+  }
+
+  public containsItineary(id: string): boolean {
+    return this.itinearies.some((itineary) => itineary.id === id);
+  }
+
   public generateItinearyId(): string {
     let genId = "Itineary" + Info.generateId();
     while(this.containsItineary(genId)) genId = "Itineary" + Info.generateId();
     return genId;
   }
 
-
-  public containsActivity(id: string): boolean {
-    return this.itinearies.flatMap(it => it.listActivities()).some(act => act.id === id);
-  }
-  
   public getActivity(id: string): Activity|undefined {
     return this.itinearies.flatMap(it => it.listActivities()).find(act => act.id === id);
   }
 
   public getItineary(id: string): Itineary | undefined {
     return this.itinearies.find(it => it.id === id);
-  }
-
-  public containsItineary(id: string): boolean {
-    return this.itinearies.some((itineary) => itineary.id === id);
   }
 
   public removeItineary(id: string): Itineary {

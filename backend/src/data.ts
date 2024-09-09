@@ -473,6 +473,69 @@ export const handleRemoveItineary = async (
     day.removeItineary(itinearyId);
   })  
 };
+/**
+ * Traveller functions
+ */
+
+export const handleGetTravellers = async (tripId: string) => {
+  return await lock.acquire("resourseLock", () => {
+    const trip = getTrip(tripId);
+    return trip.travellers;
+  })  
+}
+
+export const handleGetTraveller = async (tripId: string, travellerId: string) => {
+  return await lock.acquire("resourseLock", () => getTraveller(tripId, travellerId));  
+}
+
+export const handleNewTraveller = async (tripId: string, name: string, requireBooking: boolean = true, metadata?: object) => {
+  return await lock.acquire("resourseLock", () => {
+    const trip = getTrip(tripId);
+    const newTraveller: Person = {
+      id: trip.generateTravellerId(),
+      requireBooking: requireBooking,
+      name: name,
+    }
+    if (metadata) newTraveller.metadata = metadata;
+    trip.addTraveller(newTraveller)
+    return newTraveller.id;
+
+  })  
+}
+
+export const handleUpdateTraveller = async (tripId: string, travellerId: string, name?: string, requireBooking?: boolean, metadata?: object) => {
+  return await lock.acquire("resourseLock", () => {
+    const trip = getTrip(tripId);
+    trip.updateTraveller(travellerId, name, requireBooking, metadata);
+    return trip.wellformed();
+    
+  })  
+}
+
+export const handleRemoveTraveller = async (tripId: string, travellerId: string) => {
+  return await lock.acquire("resourseLock", () => {
+    const trip = getTrip(tripId);
+    trip.removeTraveller(travellerId);
+    return trip.wellformed();
+    
+  })  
+}
+
+export const handleAssignRoom = async (tripId: string, splitId: string, hotelId: string, roomId: string, travellerId: string) => {
+  return await lock.acquire("resourseLock", () => {
+    const split = getSplit(tripId, splitId);
+    split.assignRoom(hotelId,roomId,travellerId);
+    return; 
+  })  
+}
+
+export const handleUnassignRoom = async (tripId: string, splitId: string, hotelId: string, roomId: string, travellerId: string) => {
+  return await lock.acquire("resourseLock", () => {
+    const split = getSplit(tripId, splitId);
+    split.unassignRoom(hotelId,roomId,travellerId);
+    return;
+  })  
+}
 
 /**
  * Helper functions, Wrapper for obtaining trips
@@ -524,4 +587,11 @@ const getItineary = (tripId:string, splitId: string, dayId: string, itinearyId: 
   const itineary = day.getItineary(itinearyId);
   if (!itineary) throw new AccessError("Itineary does not exist");
   return itineary;
+}
+
+const getTraveller = (tripId: string, travellerId: string): Person => {
+  const trip = getTrip(tripId);
+  const traveller = trip.getTraveller(travellerId);
+  if (!traveller) throw new AccessError("Traveller does not exist");
+  return traveller;
 }

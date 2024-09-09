@@ -454,4 +454,8 @@ describe("Routes testing", () => {
     await deleteTry(`/itinearies/remove/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 200, {});
     await getTry(`/itinearies/${tripId}/${splitId}/${dayId}/${splitDay.itinearyId}`, 403, {});
   });
+
+  test("Person tests", async () => {
+
+  })
 });
