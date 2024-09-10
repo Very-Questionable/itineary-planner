@@ -1,25 +1,22 @@
 import fs from "fs";
-import Trip from "./Trip/Trip.js";
-import Info from "./Info.js";
+import Trip from "../Trip/Trip.js";
+import Info from "../Info.js";
 import AsyncLock from "async-lock";
-import TripSegment from "./Trip/TripSegment.js";
-import Person from "./Hotel/Person.js";
-import { AccessError, InputError } from "./Error/error.js";
-import Hotel from "./Hotel/Hotel.js";
-import Day from "./Activities/Day.js";
-import Room from "./Hotel/Room.js";
-import FreeDayItineary from "./Activities/FreeDayItineary.js";
-import SplitDayItineary from "./Activities/SplitDayItineary.js";
-import WholeDayItineary from "./Activities/WholeDayItineary.js";
-import Activity, { Activities } from "./Activities/Activity.js";
+import TripSegment from "../Trip/TripSegment.js";
+import Person from "../Hotel/Person.js";
+import { AccessError, InputError } from "../Error/error.js";
+import Hotel from "../Hotel/Hotel.js";
+import Day from "../Activities/Day.js";
+import Room from "../Hotel/Room.js";
+import FreeDayItineary from "../Activities/FreeDayItineary.js";
+import SplitDayItineary from "../Activities/SplitDayItineary.js";
+import WholeDayItineary from "../Activities/WholeDayItineary.js";
+import Activity, { Activities } from "../Activities/Activity.js";
 
 export interface TripMap {
   [key: string]: Trip;
 }
 
-export interface UserMap {
-  [key: string]: Person;
-}
 let trips: TripMap = {};
 
 const DATABASE_PATH = "./database.json";

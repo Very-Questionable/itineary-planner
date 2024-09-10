@@ -3,8 +3,8 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
-import swaggerDoc from "../swagger.json";
-import { AccessError, InputError } from "./Error/error.js";
+import swaggerDoc from "../../swagger.json";
+import { AccessError, InputError } from "../Error/error.js";
 import {
   getTrips,
   handleAssignRoom,
