@@ -1,7 +1,7 @@
 import request from "supertest";
 import server from "../src/server.js";
 import Activity, { Activities } from "../src/Activities/Activity.js";
-
+import util from "util"
 const postTry = async (
   path: string,
   status: number,
@@ -456,6 +456,71 @@ describe("Routes testing", () => {
   });
 
   test("Person tests", async () => {
+    const { tripId } = await postTry("/trips/new", 200, {
+      info: "Hello",
+      start: startdate,
+      end: day3,
+    });
+    
+    console.log(tripId)
 
+    const {splitId} = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Split1",
+      start: startdate,
+      end: day2,
+    });
+    
+    const split2 = await postTry(`/splits/new/${tripId}`, 200, {
+      info: "Split1",
+      start: day2,
+      end: day3,
+    });
+
+    const date1 = await postTry(`/days/new/${tripId}/${splitId}`, 200, {
+      info: "day1",
+      date: startdate
+    });
+    
+    const date2 = await postTry(`/days/new/${tripId}/${splitId}`, 200, {
+      info: "day2",
+      date: day2
+    });
+
+
+    const date3 = await postTry(`/days/new/${tripId}/${split2.splitId}`, 200, {
+      info: "day3",
+      date: day3
+    });
+
+    await postTry(`/itinearies/new/${tripId}/${splitId}/${date1.dayId}`, 200, { info: "Free Day", itinearyType: "FreeDayItineary"});
+    await postTry(`/itinearies/new/${tripId}/${splitId}/${date2.dayId}`, 200, { info: "Free Day", itinearyType: "FreeDayItineary"});
+    await postTry(`/itinearies/new/${tripId}/${split2.splitId}/${date3.dayId}`, 200, { info: "Free Day", itinearyType: "FreeDayItineary"});
+    const hotel1 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, { info: "Hotel", checkIn: startdate, checkOut: day2, location: "Town"});
+    const hotel2 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, { info: "Hotel", checkIn: startdate, checkOut: day2, location: "Town"});
+    const hotel3 = await postTry(`/hotels/new/${tripId}/${split2.splitId}`, 200, { info: "Hotel2", checkIn: day2, checkOut: day3, location: "Town"});
+    
+    const r1 = await postTry(`/rooms/new/${tripId}/${splitId}/${hotel1.hotelId}`,200, { info: "room1", price: 200, capacity: 1});
+    const r2 = await postTry(`/rooms/new/${tripId}/${splitId}/${hotel2.hotelId}`,200, { info: "room2", price: 200, capacity: 2});
+    const r3 = await postTry(`/rooms/new/${tripId}/${split2.splitId}/${hotel3.hotelId}`,200, { info: "room3", price: 200, capacity: 3});
+    
+    const psn1 = await postTry(`/travellers/new/${tripId}`, 200, {name: "person1"});
+    const psn2 = await postTry(`/travellers/new/${tripId}`, 200, {name: "person2"});
+    const psn3 = await postTry(`/travellers/new/${tripId}`, 200, {name: "person3"});
+    await postTry(`/rooms/${tripId}/${splitId}/${hotel1.hotelId}/${r1.roomId}/assign/${psn1.travellerId}`,200,{});
+    await postTry(`/rooms/${tripId}/${splitId}/${hotel2.hotelId}/${r2.roomId}/assign/${psn2.travellerId}`,200,{});
+    await postTry(`/rooms/${tripId}/${splitId}/${hotel2.hotelId}/${r2.roomId}/assign/${psn3.travellerId}`,200,{});
+
+    await postTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}/assign/${psn1.travellerId}`,200,{});
+    await postTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}/assign/${psn2.travellerId}`,200,{});
+    await postTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}/assign/${psn3.travellerId}`,200,{});
+
+    const tripDetails = await getTry(`/trips/${tripId}`, 200, {});
+    const daysDetails = await getTry(`/days/${tripId}`, 200, {});
+    const splitDetails = await getTry(`/splits/${tripId}/${splitId}`, 200, {});
+    const splitDetails2 = await getTry(`/splits/${tripId}/${split2.splitId}`, 200, {});
+    console.log(util.inspect(tripDetails,{showHidden: false, depth: null, colors: true}))
+    // console.log(daysDetails)
+    // console.log(splitDetails)
+    // console.log(splitDetails2)
   })
 });

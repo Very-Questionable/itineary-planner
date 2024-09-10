@@ -26,7 +26,7 @@ export default abstract class TripInfo extends Info {
    */
   public addTraveller(traveller: Person) {
     if (this.containsTraveller(traveller.id))
-      throw new Error("Traveller already added");
+      throw new InputError("Traveller already added");
     this.travellers.push(traveller);
   }
 

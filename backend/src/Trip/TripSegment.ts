@@ -31,7 +31,7 @@ export default class TripSegment extends TripInfo {
 
   public addDay(day: Day) {
     if (day.date < this.start) throw new InputError("Date before split start");
-    if (day.date >= this.end) throw new InputError("Date after split end");
+    if (day.date > this.end) throw new InputError("Date after split end");
     if (this.containsDay(day.id)) throw new AccessError("Day id already added");
     if (this.containsDate(day.date)) throw new InputError("Day already added");
     this.days.push(day);
@@ -173,9 +173,8 @@ export default class TripSegment extends TripInfo {
       (hotel) => hotel.checkIn === this.start && hotel.checkOut === this.end
     );
     const wellformedDays = this.days.every((day) => day.wellformed());
-    const dayDurationCond = this.days.length === this.duration() + 1;
     const areDaysSequential = this.days.map((day) =>
-      Math.floor(day.date.getTime() / (1000 * 60 * 60 * 24))
+      Math.floor((new Date(day.date)).getTime() / (1000 * 60 * 60 * 24))
     );
     const sequentialCond = areDaysSequential
       .map((t) => t - areDaysSequential[0]!)
@@ -185,7 +184,6 @@ export default class TripSegment extends TripInfo {
       bookedCond &&
       wellformedHotelsCond &&
       boundaryCond &&
-      dayDurationCond &&
       wellformedDays &&
       sequentialCond
     );

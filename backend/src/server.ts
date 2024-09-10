@@ -472,13 +472,14 @@ app.delete("/travellers/remove/:tripId/:travellerId", catchErrors(async (req:Req
   res.status(200).json({wellformed: wellformed});
 }));
 
-app.post("/rooms/:tripId/:splitId/:hotelId/:room/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
+app.post("/rooms/:tripId/:splitId/:hotelId/:roomId/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
   const {tripId, splitId, hotelId, roomId, travellerId} = req.params;
-  const wellformed = await handleAssignRoom(tripId,splitId,hotelId,roomId, travellerId)
+  console.log(req.params);
+  const wellformed = await handleAssignRoom(tripId, splitId, hotelId, roomId, travellerId)
   res.status(200).json({wellformed: wellformed})
 }))
 
-app.delete("/rooms/:tripId/:splitId/:hotelId/:room/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
+app.delete("/rooms/:tripId/:splitId/:hotelId/:roomId/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
   const {tripId, splitId, hotelId, roomId, travellerId} = req.params;
   await handleUnassignRoom(tripId,splitId,hotelId,roomId, travellerId)
   res.status(200).json({});

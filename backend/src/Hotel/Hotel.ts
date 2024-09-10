@@ -27,6 +27,7 @@ export default class Hotel extends HotelInfo {
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
+    console.log(this.rooms);
     const target = this.getRoom(roomId);
     if (!target) {
       throw new AccessError("Room does not exist");
@@ -39,8 +40,10 @@ export default class Hotel extends HotelInfo {
    * AddRoom
    */
   public addRoom(room: Room) {
+    console.log(this.rooms)
     if (this.containsRoom(room.id)) throw new Error("Room Id in use");
     this.rooms.push(room);
+    console.log(this.rooms)
   }
 
   /**
@@ -122,8 +125,8 @@ export default class Hotel extends HotelInfo {
       this.rooms.every(
         (room) =>
           room.wellformed() &&
-          room.checkIn.getDate() === this.checkIn.getDate() &&
-          room.checkOut.getDate() === this.checkOut.getDate()
+          (new Date(room.checkIn)).getTime() === (new Date(this.checkIn)).getTime() &&
+          (new Date(room.checkOut)).getTime() === (new Date(this.checkOut)).getTime()
       )
     );
   }

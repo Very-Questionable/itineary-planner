@@ -37,7 +37,7 @@ export default class Trip extends TripInfo {
 
   public addTraveller(traveller: Person): void {
     super.addTraveller(traveller);
-    this.splits.forEach(s => s.addTraveller(traveller));
+    this.splits.forEach(s => {if (!s.containsTraveller(traveller.id)) s.addTraveller(traveller)});
   }
 
   public removeTraveller(id: string): Person {
@@ -52,8 +52,8 @@ export default class Trip extends TripInfo {
   }
 
   public generateSplitId(): string {
-    let genId = "split" + Info.generateId();
-    while(this.containsSplit(genId)) genId = "split" + Info.generateId();
+    let genId = "Split" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "Split" + Info.generateId();
     return genId;
   }
   
@@ -154,7 +154,7 @@ export default class Trip extends TripInfo {
   wellformed(): boolean {
     const wellformedSplits = this.splits.every((s) => s.wellformed());
     const areDaysSequential = this.listDays().map((day) =>
-      Math.abs(day.date.getTime() / (1000 * 60 * 60 * 24))
+      Math.abs((new Date(day.date)).getTime() / (1000 * 60 * 60 * 24))
     );
 
     const sequentialCond = areDaysSequential
