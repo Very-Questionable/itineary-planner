@@ -23,16 +23,11 @@ export default class Hotel extends HotelInfo {
     this.rooms = rooms ? rooms! : [];
   }
 
-  public generateRoomId(): string {
-    let genId = "Room" + Info.generateId();
-    while(this.containsRoom(genId)) genId = "Room" + Info.generateId();
-    return genId;
-  }
-
   /**
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
+    console.log(this.rooms);
     const target = this.getRoom(roomId);
     if (!target) {
       throw new AccessError("Room does not exist");
@@ -41,16 +36,14 @@ export default class Hotel extends HotelInfo {
     target.addPerson(person);
   }
 
-  public listPersons(): Array<Person> {
-    return this.rooms.flatMap((room) => room.persons);
-  }
-
   /**
    * AddRoom
    */
   public addRoom(room: Room) {
+    console.log(this.rooms)
     if (this.containsRoom(room.id)) throw new Error("Room Id in use");
     this.rooms.push(room);
+    console.log(this.rooms)
   }
 
   /**
@@ -68,8 +61,18 @@ export default class Hotel extends HotelInfo {
     return this.rooms.some((room) => room.id === id);
   }
 
+  public generateRoomId(): string {
+    let genId = "Room" + Info.generateId();
+    while(this.containsRoom(genId)) genId = "Room" + Info.generateId();
+    return genId;
+  }
+
   public getRoom(id: string): Room | undefined {
     return this.rooms.find((room) => room.id === id);
+  }
+
+  public listPersons(): Array<Person> {
+    return this.rooms.flatMap((room) => room.persons);
   }
 
   public removePerson(roomId: string, personId: string): Person {
@@ -113,8 +116,7 @@ export default class Hotel extends HotelInfo {
 
     // Unique people ids
     const allPeople = this.rooms.flatMap((room) => room.persons);
-    const nubbedPeople = new Set(allRooms);
-
+    const nubbedPeople = new Set(allPeople);
     return (
       this.rooms.length > 0 &&
       allRooms.length === nubbedRooms.size &&
@@ -122,8 +124,8 @@ export default class Hotel extends HotelInfo {
       this.rooms.every(
         (room) =>
           room.wellformed() &&
-          room.checkIn.getDate() === this.checkIn.getDate() &&
-          room.checkOut.getDate() === this.checkOut.getDate()
+          (new Date(room.checkIn)).getTime() === (new Date(this.checkIn)).getTime() &&
+          (new Date(room.checkOut)).getTime() === (new Date(this.checkOut)).getTime()
       )
     );
   }

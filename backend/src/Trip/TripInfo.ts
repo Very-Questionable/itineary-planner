@@ -21,21 +21,12 @@ export default abstract class TripInfo extends Info {
     this.travellers = travelers ? travelers! : [];
   }
 
-  public updateDates(start?: Date, end?: Date) {
-    const newStart: Date = start ? start : this.start;
-    const newEnd: Date = end ? end : this.end;
-    if (newStart > newEnd)
-      throw new InputError("Start after end");
-    this.start = newStart;
-    this.end = newEnd;
-  }
-
   /**
    * addTraveller
    */
   public addTraveller(traveller: Person) {
     if (this.containsTraveller(traveller.id))
-      throw new Error("Traveller already added");
+      throw new InputError("Traveller already added");
     this.travellers.push(traveller);
   }
 
@@ -46,6 +37,16 @@ export default abstract class TripInfo extends Info {
    */
   public containsTraveller(id: string): boolean {
     return this.travellers.some((traveller) => traveller.id === id);
+  }
+
+  /**
+   * returns duration of stay in nights
+   */
+  public duration(): number {
+    return Math.floor(
+      Math.abs((new Date(this.end)).getTime() - (new Date(this.start)).getTime()) /
+        (1000 * 60 * 60 * 24)
+    );
   }
 
   /**
@@ -69,13 +70,20 @@ export default abstract class TripInfo extends Info {
     return target;
   }
 
-  /**
-   * returns duration of stay in nights
-   */
-  public duration(): number {
-    return Math.floor(
-      Math.abs((new Date(this.end)).getTime() - (new Date(this.start)).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
+  public updateDates(start?: Date, end?: Date) {
+    const newStart: Date = start ? start : this.start;
+    const newEnd: Date = end ? end : this.end;
+    if (newStart > newEnd)
+      throw new InputError("Start after end");
+    this.start = newStart;
+    this.end = newEnd;
+  }
+
+  public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
+    const target = this.getTraveller(travellerId)
+    if (!target) return;
+    if (name) target.name = name;
+    target.requireBooking = requireBooking;
+    if (metadata) target.metadata = metadata;
   }
 }

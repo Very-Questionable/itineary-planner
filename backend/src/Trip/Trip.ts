@@ -8,7 +8,7 @@ import TripSegment from "./TripSegment.js";
 
 export default class Trip extends TripInfo {
   splits: Array<TripSegment>;
-
+  
   constructor(
     id: string,
     info: string,
@@ -22,9 +22,38 @@ export default class Trip extends TripInfo {
     this.splits = splits ? splits! : [];
   }
 
+  /**
+   * Checks if a split is overlapping with the rest of the splits beyond allowed leyway
+   * @param split
+   * @returns
+   */
+  private isOverlapping(split: TripSegment): boolean {
+    return this.splits.some(
+      (s) =>
+        s.end > split.start &&
+        split.end > s.start
+    );
+  }
+
+  public addTraveller(traveller: Person): void {
+    super.addTraveller(traveller);
+    this.splits.forEach(s => {if (!s.containsTraveller(traveller.id)) s.addTraveller(traveller)});
+  }
+
+  public removeTraveller(id: string): Person {
+    const target = super.removeTraveller(id);
+    this.splits.forEach(s => s.removeTraveller(id));
+    return target
+  }
+  
+  public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
+    super.updateTraveller(travellerId, name, requireBooking, metadata)
+    this.splits.forEach(s => s.updateTraveller(travellerId,name,requireBooking,metadata))
+  }
+
   public generateSplitId(): string {
-    let genId = "split" + Info.generateId();
-    while(this.containsSplit(genId)) genId = "split" + Info.generateId();
+    let genId = "Split" + Info.generateId();
+    while(this.containsSplit(genId)) genId = "Split" + Info.generateId();
     return genId;
   }
   
@@ -53,19 +82,6 @@ export default class Trip extends TripInfo {
       ? (new Date(a.start)).getTime() - (new Date(b.start)).getTime()
       : (new Date(a.end)).getTime() - (new Date(b.end)).getTime()
     
-    );
-  }
-
-  /**
-   * Checks if a split is overlapping with the rest of the splits beyond allowed leyway
-   * @param split
-   * @returns
-   */
-  private isOverlapping(split: TripSegment): boolean {
-    return this.splits.some(
-      (s) =>
-        s.end > split.start &&
-        split.end > s.start
     );
   }
 
@@ -138,7 +154,7 @@ export default class Trip extends TripInfo {
   wellformed(): boolean {
     const wellformedSplits = this.splits.every((s) => s.wellformed());
     const areDaysSequential = this.listDays().map((day) =>
-      Math.abs(day.date.getTime() / (1000 * 60 * 60 * 24))
+      Math.abs((new Date(day.date)).getTime() / (1000 * 60 * 60 * 24))
     );
 
     const sequentialCond = areDaysSequential

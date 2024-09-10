@@ -3,7 +3,7 @@ import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 
 export default class Room extends HotelInfo {
-  capacity: number;
+  private capacity: number;
   persons: Array<Person>;
   price: number;
   // Partially Filled room
