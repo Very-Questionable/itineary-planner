@@ -518,6 +518,16 @@ describe("Routes testing", () => {
     const daysDetails = await getTry(`/days/${tripId}`, 200, {});
     const splitDetails = await getTry(`/splits/${tripId}/${splitId}`, 200, {});
     const splitDetails2 = await getTry(`/splits/${tripId}/${split2.splitId}`, 200, {});
+    const room1Detail = await getTry(`/rooms/${tripId}/${splitId}/${hotel1.hotelId}/${r1.roomId}`, 200, {});
+    const room2Detail = await getTry(`/rooms/${tripId}/${splitId}/${hotel2.hotelId}/${r2.roomId}`, 200, {});
+    const room3Detail = await getTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}`, 200, {});
+    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
+    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
+    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
+    expect(room1Detail.wellformed).toBeTruthy();
+    expect(room2Detail.wellformed).toBeTruthy();
+    expect(room3Detail.wellformed).toBeTruthy();
+    
     console.log(util.inspect(tripDetails,{showHidden: false, depth: null, colors: true}))
     // console.log(daysDetails)
     // console.log(splitDetails)
