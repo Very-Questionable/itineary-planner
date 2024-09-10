@@ -116,8 +116,7 @@ export default class Hotel extends HotelInfo {
 
     // Unique people ids
     const allPeople = this.rooms.flatMap((room) => room.persons);
-    const nubbedPeople = new Set(allRooms);
-
+    const nubbedPeople = new Set(allPeople);
     return (
       this.rooms.length > 0 &&
       allRooms.length === nubbedRooms.size &&

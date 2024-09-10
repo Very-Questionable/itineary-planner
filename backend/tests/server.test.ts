@@ -52,7 +52,7 @@ const sendTry = async (
       ? req.put(path)
       : req.put(path);
   const response = await req2.send(payload);
-  console.log(response.body)
+  console.log(util.inspect(response.body,{showHidden: false, depth: null, colors: true}))
   expect(response.statusCode).toBe(status);
   return response.body;
 };
@@ -496,8 +496,8 @@ describe("Routes testing", () => {
     await postTry(`/itinearies/new/${tripId}/${splitId}/${date2.dayId}`, 200, { info: "Free Day", itinearyType: "FreeDayItineary"});
     await postTry(`/itinearies/new/${tripId}/${split2.splitId}/${date3.dayId}`, 200, { info: "Free Day", itinearyType: "FreeDayItineary"});
     const hotel1 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, { info: "Hotel", checkIn: startdate, checkOut: day2, location: "Town"});
-    const hotel2 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, { info: "Hotel", checkIn: startdate, checkOut: day2, location: "Town"});
-    const hotel3 = await postTry(`/hotels/new/${tripId}/${split2.splitId}`, 200, { info: "Hotel2", checkIn: day2, checkOut: day3, location: "Town"});
+    const hotel2 = await postTry(`/hotels/new/${tripId}/${splitId}`, 200, { info: "Hotel2", checkIn: startdate, checkOut: day2, location: "Town"});
+    const hotel3 = await postTry(`/hotels/new/${tripId}/${split2.splitId}`, 200, { info: "Hotel3", checkIn: day2, checkOut: day3, location: "Town"});
     
     const r1 = await postTry(`/rooms/new/${tripId}/${splitId}/${hotel1.hotelId}`,200, { info: "room1", price: 200, capacity: 1});
     const r2 = await postTry(`/rooms/new/${tripId}/${splitId}/${hotel2.hotelId}`,200, { info: "room2", price: 200, capacity: 2});
@@ -514,23 +514,35 @@ describe("Routes testing", () => {
     await postTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}/assign/${psn2.travellerId}`,200,{});
     await postTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}/assign/${psn3.travellerId}`,200,{});
 
-    const tripDetails = await getTry(`/trips/${tripId}`, 200, {});
-    const daysDetails = await getTry(`/days/${tripId}`, 200, {});
-    const splitDetails = await getTry(`/splits/${tripId}/${splitId}`, 200, {});
-    const splitDetails2 = await getTry(`/splits/${tripId}/${split2.splitId}`, 200, {});
+    
     const room1Detail = await getTry(`/rooms/${tripId}/${splitId}/${hotel1.hotelId}/${r1.roomId}`, 200, {});
-    const room2Detail = await getTry(`/rooms/${tripId}/${splitId}/${hotel2.hotelId}/${r2.roomId}`, 200, {});
-    const room3Detail = await getTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}`, 200, {});
-    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
-    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
-    const hotel1Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
     expect(room1Detail.wellformed).toBeTruthy();
+    const room2Detail = await getTry(`/rooms/${tripId}/${splitId}/${hotel2.hotelId}/${r2.roomId}`, 200, {});
     expect(room2Detail.wellformed).toBeTruthy();
+    const room3Detail = await getTry(`/rooms/${tripId}/${split2.splitId}/${hotel3.hotelId}/${r3.roomId}`, 200, {});
     expect(room3Detail.wellformed).toBeTruthy();
     
-    console.log(util.inspect(tripDetails,{showHidden: false, depth: null, colors: true}))
-    // console.log(daysDetails)
-    // console.log(splitDetails)
-    // console.log(splitDetails2)
+    const hotel1Detail = await getTry(`/hotels/${tripId}/${splitId}/${hotel1.hotelId}`, 200, {});
+    expect(hotel1Detail.wellformed).toBeTruthy();
+    const hotel2Detail = await getTry(`/hotels/${tripId}/${splitId}/${hotel2.hotelId}`, 200, {});
+    expect(hotel2Detail.wellformed).toBeTruthy();
+    const hotel3Detail = await getTry(`/hotels/${tripId}/${split2.splitId}/${hotel3.hotelId}`, 200, {});
+    expect(hotel3Detail.wellformed).toBeTruthy();
+    
+    const tripDetails = await getTry(`/trips/${tripId}`, 200, {});
+    const splitDetails = await getTry(`/splits/${tripId}/${splitId}`, 200, {});
+    const splitDetails2 = await getTry(`/splits/${tripId}/${split2.splitId}`, 200, {});
+    expect(splitDetails.wellformed).toBeTruthy();
+    expect(splitDetails2.wellformed).toBeTruthy();
+    expect(tripDetails.wellformed).toBeTruthy();
+    
+    const updatedTrav = await putTry(`/travellers/update/${tripId}/${psn1.travellerId}`,200, {
+      name: "Per Sona",
+      metadata: {hello: "world"}
+    })
+    expect(updatedTrav.wellformed).toBeTruthy();
+    await deleteTry(`/travellers/remove/${tripId}/${psn1.travellerId}`,200, {})
+    await getTry(`/travellers/${tripId}/${psn1.travellerId}`, 403, {});
+    
   })
 });
