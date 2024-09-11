@@ -288,7 +288,7 @@ describe("Routes testing", () => {
       200,
       {}
     );
-    expect(rooms).toStrictEqual([room1.room, room2.room]);
+    expect(Object.values(rooms)).toStrictEqual([room1.room, room2.room]);
 
     await deleteTry(
       `/rooms/remove/${tripId}/${splitId}/${hotelId}/${r1.roomId}`,

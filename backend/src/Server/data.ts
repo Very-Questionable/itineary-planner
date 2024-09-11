@@ -12,7 +12,7 @@ import FreeDayItineary from "../Activities/FreeDayItineary.js";
 import SplitDayItineary from "../Activities/SplitDayItineary.js";
 import WholeDayItineary from "../Activities/WholeDayItineary.js";
 import Activity, { Activities } from "../Activities/Activity.js";
-import { TripMap } from "./interfaces.js";
+import { RoomMap, TripMap } from "./interfaces.js";
 
 
 let trips: TripMap = {};
@@ -280,7 +280,7 @@ export const handleGetRooms = async (
   tripId: string,
   splitId: string,
   hotelId: string
-): Promise<Array<Room>> => {
+): Promise<RoomMap> => {
   return await lock.acquire("resourseLock", () => {
     const hotel = getHotel(tripId, splitId, hotelId);
     return hotel.rooms;

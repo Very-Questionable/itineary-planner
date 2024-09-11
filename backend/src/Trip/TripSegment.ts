@@ -111,7 +111,7 @@ export default class TripSegment extends TripInfo {
   public removeTraveller(id: string): Person {
     const target = super.removeTraveller(id);
     this.hotels.forEach(h => {
-      h.rooms.forEach(r => {
+      Object.values(h.rooms).forEach(r => {
         if (r.containsPerson(id)) r.removePerson(id);
       })
     });
@@ -138,7 +138,7 @@ export default class TripSegment extends TripInfo {
 
   public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
     super.updateTraveller(travellerId, name, requireBooking,metadata);
-    this.hotels.forEach(h => h.rooms.forEach(r => {
+    this.hotels.forEach(h => Object.values(h.rooms).forEach(r => {
       const person = r.getPerson(travellerId);
       if (person) {
         if (name) person.name = name;
