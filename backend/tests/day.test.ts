@@ -41,9 +41,9 @@ describe("Day tests", () => {
     myDay.addItineary(mySplitItineary);
     myDay.addItineary(myWholeItineary);
 
-    expect(myDay.itinearies).toContain(myWholeItineary);
-    expect(myDay.itinearies).toContain(mySplitItineary);
-    expect(myDay.itinearies).toContain(myFreeItineary);
+    expect(Object.values(myDay.itinearies)).toContain(myWholeItineary);
+    expect(Object.values(myDay.itinearies)).toContain(mySplitItineary);
+    expect(Object.values(myDay.itinearies)).toContain(myFreeItineary);
 
   });
 

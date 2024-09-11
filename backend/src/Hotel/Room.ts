@@ -60,7 +60,7 @@ export default class Room extends HotelInfo {
    * @returns if the room contains a person with the required id
    */
   public containsPerson(id: string): boolean {
-    return this.persons[id] !== undefined;
+    return id in this.persons;
   }
 
   /**

@@ -1,24 +1,25 @@
 import { InputError } from "../Error/error.js";
 import Person from "../Hotel/Person.js";
 import Info from "../Info.js";
+import { TravellerMap } from "../Server/interfaces.js";
 
 export default abstract class TripInfo extends Info {
   end: Date;
   start: Date;
-  travellers: Array<Person>;
+  travellers: TravellerMap = {};
   constructor(
     id: string,
     info: string,
     start: Date,
     end: Date,
-    travelers?: Array<Person>,
+    travellers?: Array<Person>,
     metadata?: object
   ) {
     if (start > end) throw new InputError("Start date after End Date");
     super(id, info, metadata);
     this.start = start;
     this.end = end;
-    this.travellers = travelers ? travelers! : [];
+    travellers?.forEach(t => this.addTraveller(t));
   }
 
   /**
@@ -27,7 +28,7 @@ export default abstract class TripInfo extends Info {
   public addTraveller(traveller: Person) {
     if (this.containsTraveller(traveller.id))
       throw new InputError("Traveller already added");
-    this.travellers.push(traveller);
+    this.travellers[traveller.id] = traveller;
   }
 
   /**
@@ -36,7 +37,7 @@ export default abstract class TripInfo extends Info {
    * @returns
    */
   public containsTraveller(id: string): boolean {
-    return this.travellers.some((traveller) => traveller.id === id);
+    return id in this.travellers; 
   }
 
   /**
@@ -55,7 +56,7 @@ export default abstract class TripInfo extends Info {
    * @returns Maybe Person
    */
   public getTraveller(id: string): Person | undefined {
-    return this.travellers.find((traveller) => traveller.id === id);
+    return this.travellers[id]; 
   }
 
   /**
@@ -65,8 +66,7 @@ export default abstract class TripInfo extends Info {
   public removeTraveller(id: string): Person {
     const target = this.getTraveller(id);
     if (!target) throw new Error("Traveller does not exist");
-    this.travellers = this.travellers.filter((person) => person.id !== id);
-
+    delete this.travellers[id];
     return target;
   }
 
