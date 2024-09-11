@@ -12,10 +12,8 @@ import FreeDayItineary from "../Activities/FreeDayItineary.js";
 import SplitDayItineary from "../Activities/SplitDayItineary.js";
 import WholeDayItineary from "../Activities/WholeDayItineary.js";
 import Activity, { Activities } from "../Activities/Activity.js";
+import { TripMap } from "./interfaces.js";
 
-export interface TripMap {
-  [key: string]: Trip;
-}
 
 let trips: TripMap = {};
 

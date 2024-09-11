@@ -27,7 +27,6 @@ export default class Hotel extends HotelInfo {
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
-    console.log(this.rooms);
     const target = this.getRoom(roomId);
     if (!target) {
       throw new AccessError("Room does not exist");
@@ -72,7 +71,7 @@ export default class Hotel extends HotelInfo {
   }
 
   public listPersons(): Array<Person> {
-    return this.rooms.flatMap((room) => room.persons);
+    return this.rooms.flatMap((room) => Object.values(room.persons));
   }
 
   public removePerson(roomId: string, personId: string): Person {
@@ -115,7 +114,7 @@ export default class Hotel extends HotelInfo {
     const nubbedRooms = new Set(allRooms);
 
     // Unique people ids
-    const allPeople = this.rooms.flatMap((room) => room.persons);
+    const allPeople = this.rooms.flatMap((room) => Object.values(room.persons));
     const nubbedPeople = new Set(allPeople);
     return (
       this.rooms.length > 0 &&

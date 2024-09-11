@@ -57,11 +57,11 @@ app.use(morgan(":method :url :status"));
 const catchErrors =
   (fn: CallableFunction) => async (req: Request, res: Response) => {
     try {
-      console.log(`Authorization header is ${req.header("Authorization")}`);
+      // console.log(`Authorization header is ${req.header("Authorization")}`);
       if (req.method === "GET") {
-        console.log(`Query params are ${JSON.stringify(req.params)}`);
+        // console.log(`Query params are ${JSON.stringify(req.params)}`);
       } else {
-        console.log(`Body params are ${JSON.stringify(req.body)}`);
+        // console.log(`Body params are ${JSON.stringify(req.body)}`);
       }
       await fn(req, res);
       await save();
@@ -474,7 +474,6 @@ app.delete("/travellers/remove/:tripId/:travellerId", catchErrors(async (req:Req
 
 app.post("/rooms/:tripId/:splitId/:hotelId/:roomId/assign/:travellerId", catchErrors(async (req:Request, res:Response) => {
   const {tripId, splitId, hotelId, roomId, travellerId} = req.params;
-  console.log(req.params);
   const wellformed = await handleAssignRoom(tripId, splitId, hotelId, roomId, travellerId)
   res.status(200).json({wellformed: wellformed})
 }))

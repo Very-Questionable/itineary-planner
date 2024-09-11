@@ -1,10 +1,11 @@
 import { AccessError, InputError } from "../Error/error.js";
+import { TravellerMap } from "../Server/interfaces.js";
 import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 
 export default class Room extends HotelInfo {
   private capacity: number;
-  persons: Array<Person>;
+  persons: TravellerMap = {};
   price: number;
   // Partially Filled room
   constructor(
@@ -20,7 +21,7 @@ export default class Room extends HotelInfo {
     super(id, info, checkIn, checkOut, metadata);
     this.price = price;
     this.capacity = capacity;
-    this.persons = persons ? persons! : [];
+    persons?.forEach(p => this.addPerson(p));
   }
 
   public updatePrice(price?: number, capacity?: number) {
@@ -33,11 +34,11 @@ export default class Room extends HotelInfo {
    */
   public addPerson(newPerson: Person) {
     if (this.containsPerson(newPerson.id)) throw new AccessError("Person id in use");
-    if (this.persons.length + 1 > this.capacity) {
+    if (Object.keys(this.persons).length + 1 > this.capacity) {
       throw new InputError("Capacity for this room has been reach");
     }
 
-    this.persons.push(newPerson);
+    this.persons[newPerson.id] = newPerson;
   }
 
   /**
@@ -49,8 +50,8 @@ export default class Room extends HotelInfo {
       throw new AccessError("Invalid person Id, cannot find person");
     }
 
-    this.persons = this.persons.filter((person) => personId !== person.id);
-    return target!;
+    delete this.persons[personId];
+    return target;
   }
 
   /**
@@ -59,7 +60,7 @@ export default class Room extends HotelInfo {
    * @returns if the room contains a person with the required id
    */
   public containsPerson(id: string): boolean {
-    return this.persons.some((person) => person.id === id);
+    return this.persons[id] !== undefined;
   }
 
   /**
@@ -68,14 +69,14 @@ export default class Room extends HotelInfo {
    * @returns maybe person info
    */
   public getPerson(id: string): Person | undefined {
-    return this.persons.find((person) => person.id === id);
+    return this.persons[id];
   }
 
   /**
    * Clear: Clears all persons
    */
   public clear(): void {
-    this.persons = [];
+    this.persons = {};
   }
 
   /**
@@ -104,6 +105,6 @@ export default class Room extends HotelInfo {
    * Wellformed if at capacity
    */
   wellformed(): boolean {
-    return this.persons.length === this.capacity && this.capacity > 0;
+    return Object.keys(this.persons).length === this.capacity && this.capacity > 0;
   }
 }
