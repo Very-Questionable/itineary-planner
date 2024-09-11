@@ -1,12 +1,13 @@
 import { AccessError } from "../Error/error.js";
 import Info from "../Info.js";
+import { RoomMap } from "../Server/interfaces.js";
 import HotelInfo from "./HotelInfo.js";
 import Person from "./Person.js";
 import Room from "./Room.js";
 
 export default class Hotel extends HotelInfo {
   location: string;
-  rooms: Array<Room>;
+  rooms: RoomMap = {};
 
   constructor(
     id: string,
@@ -20,14 +21,13 @@ export default class Hotel extends HotelInfo {
     super(id, info, checkIn, checkOut, metadata);
 
     this.location = location;
-    this.rooms = rooms ? rooms! : [];
+    rooms?.forEach(r => this.addRoom(r));
   }
 
   /**
    * addPerson
    */
   public addPerson(roomId: string, person: Person) {
-    console.log(this.rooms);
     const target = this.getRoom(roomId);
     if (!target) {
       throw new AccessError("Room does not exist");
@@ -40,25 +40,23 @@ export default class Hotel extends HotelInfo {
    * AddRoom
    */
   public addRoom(room: Room) {
-    console.log(this.rooms)
     if (this.containsRoom(room.id)) throw new Error("Room Id in use");
-    this.rooms.push(room);
-    console.log(this.rooms)
+    this.rooms[room.id] = room;
   }
 
   /**
    * Clears all rooms
    */
   public clear(): void {
-    this.rooms = [];
+    this.rooms = {};
   }
 
   public containsPerson(id: string): boolean {
-    return this.rooms.some((room) => room.containsPerson(id));
+    return Object.values(this.rooms).some((room) => room.containsPerson(id));
   }
 
   public containsRoom(id: string): boolean {
-    return this.rooms.some((room) => room.id === id);
+    return id in this.rooms;
   }
 
   public generateRoomId(): string {
@@ -68,11 +66,11 @@ export default class Hotel extends HotelInfo {
   }
 
   public getRoom(id: string): Room | undefined {
-    return this.rooms.find((room) => room.id === id);
+    return this.rooms[id]; 
   }
 
   public listPersons(): Array<Person> {
-    return this.rooms.flatMap((room) => room.persons);
+    return Object.values(this.rooms).flatMap((room) => Object.values(room.persons));
   }
 
   public removePerson(roomId: string, personId: string): Person {
@@ -90,14 +88,14 @@ export default class Hotel extends HotelInfo {
     const target = this.getRoom(roomId);
     if (!target) throw new AccessError("Room does not exist");
 
-    this.rooms = this.rooms.filter((room) => room.id !== roomId);
+    delete this.rooms[roomId]
     return target;
   }
 
 
   public updateDates(start?: Date, end?: Date) {
     super.updateDates(start,end);
-    this.rooms.forEach(r => r.updateDates(start,end));
+    Object.values(this.rooms).forEach(r => r.updateDates(start,end));
   }
 
   /**
@@ -111,17 +109,14 @@ export default class Hotel extends HotelInfo {
    */
   wellformed(): boolean {
     // Unique Room ids
-    const allRooms = this.rooms.map((room) => room.id);
-    const nubbedRooms = new Set(allRooms);
 
     // Unique people ids
-    const allPeople = this.rooms.flatMap((room) => room.persons);
+    const allPeople = Object.values(this.rooms).flatMap((room) => Object.keys(room.persons));
     const nubbedPeople = new Set(allPeople);
     return (
-      this.rooms.length > 0 &&
-      allRooms.length === nubbedRooms.size &&
+      Object.values(this.rooms).length > 0 &&
       allPeople.length === nubbedPeople.size &&
-      this.rooms.every(
+      Object.values(this.rooms).every(
         (room) =>
           room.wellformed() &&
           (new Date(room.checkIn)).getTime() === (new Date(this.checkIn)).getTime() &&

@@ -209,7 +209,7 @@ describe("Routes testing", () => {
       200,
       {}
     );
-    expect(hotels).toStrictEqual([hotel1.hotel, hotel2.hotel]);
+    expect(Object.values(hotels)).toStrictEqual([hotel1.hotel, hotel2.hotel]);
 
     await deleteTry(
       `/hotels/remove/${tripId}/${splitId}/${res.hotelId}`,
@@ -288,7 +288,7 @@ describe("Routes testing", () => {
       200,
       {}
     );
-    expect(rooms).toStrictEqual([room1.room, room2.room]);
+    expect(Object.values(rooms)).toStrictEqual([room1.room, room2.room]);
 
     await deleteTry(
       `/rooms/remove/${tripId}/${splitId}/${hotelId}/${r1.roomId}`,
@@ -504,7 +504,7 @@ describe("Routes testing", () => {
       {}
     );
 
-    expect(itinearies).toStrictEqual([
+    expect(Object.values(itinearies)).toStrictEqual([
       freeDetail.itineary,
       wholeDetail.itineary,
       splitDetail.itineary,

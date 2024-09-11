@@ -12,10 +12,8 @@ import FreeDayItineary from "../Activities/FreeDayItineary.js";
 import SplitDayItineary from "../Activities/SplitDayItineary.js";
 import WholeDayItineary from "../Activities/WholeDayItineary.js";
 import Activity, { Activities } from "../Activities/Activity.js";
+import { RoomMap, TripMap } from "./interfaces.js";
 
-export interface TripMap {
-  [key: string]: Trip;
-}
 
 let trips: TripMap = {};
 
@@ -132,7 +130,7 @@ export const handleCreateNewSplit = async (
       info,
       start,
       end,
-      targetTrip.travellers
+      Object.values(targetTrip.travellers)
     );
     targetTrip.addSplit(newSplit);
     trips[tripId] = targetTrip;
@@ -162,20 +160,12 @@ export const handleUpdateSplit = async (
 ): Promise<boolean> =>
   await lock.acquire("resourseLock", () => {
     const targetTrip = trips[tripId];
-    const travellers = targetTrip.travellers;
     if (!targetTrip) throw new AccessError("Trip does not exist");
     const targetSplit = targetTrip.getSplit(splitId);
     if (!targetSplit) throw new AccessError("Trip does not exist");
 
     targetSplit.updateInfo(info, metadata);
     targetSplit.updateDates(start, end);
-    if (travellers)
-      travellers.forEach((t: Person) => {
-        if (targetSplit.containsTraveller(t.id))
-          targetSplit.removeTraveller(t.id);
-        targetSplit.addTraveller(t);
-      });
-
     return targetSplit.wellformed();
   });
 
@@ -282,7 +272,7 @@ export const handleGetRooms = async (
   tripId: string,
   splitId: string,
   hotelId: string
-): Promise<Array<Room>> => {
+): Promise<RoomMap> => {
   return await lock.acquire("resourseLock", () => {
     const hotel = getHotel(tripId, splitId, hotelId);
     return hotel.rooms;

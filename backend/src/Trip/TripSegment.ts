@@ -3,11 +3,12 @@ import { AccessError, InputError } from "../Error/error.js";
 import Hotel from "../Hotel/Hotel.js";
 import Person from "../Hotel/Person.js";
 import Info from "../Info.js";
+import { HotelMap } from "../Server/interfaces.js";
 import TripInfo from "./TripInfo.js";
 
 export default class TripSegment extends TripInfo {
   days: Array<Day>;
-  hotels: Array<Hotel>;
+  hotels: HotelMap = {};
 
   constructor(
     id: string,
@@ -19,7 +20,7 @@ export default class TripSegment extends TripInfo {
     days?: Array<Day>
   ) {
     super(id, info, start, end, travellers);
-    this.hotels = hotels ? hotels! : [];
+    hotels?.forEach(h => this.addHotel(h));
     this.days = days
       ? days!.sort((a, b) => a.date.getTime() - b.date.getTime())
       : [];
@@ -45,19 +46,24 @@ export default class TripSegment extends TripInfo {
   public addHotel(hotel: Hotel) {
     if (this.containsHotel(hotel.id))
       throw new AccessError("Hotel already added");
-    this.hotels.push(hotel);
+    this.hotels[hotel.id] = hotel;
   }
 
+  /**
+   * Assigns a room to a traveller
+   * @param hotelId 
+   * @param roomId 
+   * @param travelerId 
+   */
   public assignRoom(hotelId: string, roomId: string, travelerId: string) {
-    const targetTraveller = this.travellers.find(
-      (traveler) => traveler.id === travelerId
-    );
+    const targetTraveller = this.getTraveller(travelerId);
     const targetHotel = this.getHotel(hotelId);
+
     if (!targetTraveller) throw new AccessError("Traveller does not exist");
     if (!targetHotel) throw new AccessError("Hotel does not exist");
     if (!targetHotel.containsRoom(roomId))
       throw new AccessError("Room does not exist");
-    if (this.hotels.some((hotel) => hotel.containsPerson(travelerId)))
+    if (Object.values(this.hotels).some((hotel) => hotel.containsPerson(travelerId)))
       throw new InputError("Traveller already has a room");
 
     targetHotel.addPerson(roomId, targetTraveller);
@@ -68,7 +74,7 @@ export default class TripSegment extends TripInfo {
   }
 
   public containsHotel(id: string): boolean {
-    return this.hotels.some((hotel) => hotel.id === id);
+    return id in this.hotels; 
   }
 
   public generateDayId(): string {
@@ -88,7 +94,7 @@ export default class TripSegment extends TripInfo {
   }
 
   public getHotel(id: string): Hotel | undefined {
-    return this.hotels.find((hotel) => hotel.id === id);
+    return this.hotels[id]; 
   }
 
   public removeDay(id: string): Day {
@@ -103,21 +109,27 @@ export default class TripSegment extends TripInfo {
   public removeHotel(id: string): Hotel {
     const target = this.getHotel(id);
     if (!target) throw new AccessError("Hotel does not exist");
-    this.hotels = this.hotels.filter((hotel) => hotel.id !== id);
-
+    delete this.hotels[id];
     return target;
   }
 
   public removeTraveller(id: string): Person {
     const target = super.removeTraveller(id);
-    this.hotels.forEach(h => {
-      h.rooms.forEach(r => {
+    Object.values(this.hotels).forEach(h => {
+      Object.values(h.rooms).forEach(r => {
         if (r.containsPerson(id)) r.removePerson(id);
       })
     });
     return target;
   }
 
+  /**
+   * Removes a traveller from a room
+   * @param hotelId 
+   * @param roomId 
+   * @param personId 
+   * @returns 
+   */
   public unassignRoom(
     hotelId: string,
     roomId: string,
@@ -133,12 +145,12 @@ export default class TripSegment extends TripInfo {
 
   public updateDates(start?: Date, end?: Date) {
     super.updateDates(start,end);
-    this.hotels.forEach(h => h.updateDates(start,end));
+    Object.values(this.hotels).forEach(h => h.updateDates(start,end));
   }
 
   public updateTraveller(travellerId: string, name?: string, requireBooking: boolean = true, metadata?: object) {
     super.updateTraveller(travellerId, name, requireBooking,metadata);
-    this.hotels.forEach(h => h.rooms.forEach(r => {
+    Object.values(this.hotels).forEach(h => Object.values(h.rooms).forEach(r => {
       const person = r.getPerson(travellerId);
       if (person) {
         if (name) person.name = name;
@@ -158,18 +170,18 @@ export default class TripSegment extends TripInfo {
    *  - There are no skipped days
    */
   wellformed(): boolean {
-    const bookedTravellers = this.hotels.flatMap((hotel) =>
+    const bookedTravellers = Object.values(this.hotels).flatMap((hotel) =>
       hotel.listPersons()
     );
     const bookedCond =
-      this.travellers.every(
+      Object.values(this.travellers).every(
         (person) =>
           person.requireBooking || bookedTravellers.some((p) => p === person)
-      ) && bookedTravellers.length === this.travellers.length;
-    const wellformedHotelsCond = this.hotels.every((hotel) =>
+      ) && bookedTravellers.length === Object.values(this.travellers).length;
+    const wellformedHotelsCond = Object.values(this.hotels).every((hotel) =>
       hotel.wellformed()
     );
-    const boundaryCond = this.hotels.every(
+    const boundaryCond = Object.values(this.hotels).every(
       (hotel) => hotel.checkIn === this.start && hotel.checkOut === this.end
     );
     const wellformedDays = this.days.every((day) => day.wellformed());

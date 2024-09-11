@@ -37,7 +37,7 @@ export default class Trip extends TripInfo {
 
   public addTraveller(traveller: Person): void {
     super.addTraveller(traveller);
-    this.splits.forEach(s => {if (!s.containsTraveller(traveller.id)) s.addTraveller(traveller)});
+    this.splits?.forEach(s => {if (!s.containsTraveller(traveller.id)) s.addTraveller(traveller)});
   }
 
   public removeTraveller(id: string): Person {
@@ -114,7 +114,7 @@ export default class Trip extends TripInfo {
   }
 
   public listHotels(): Array<Hotel> {
-    return this.splits.flatMap((split) => split.hotels);
+    return this.splits.flatMap((split) => Object.values(split.hotels));
   }
 
   // Itineary logic
@@ -163,7 +163,7 @@ export default class Trip extends TripInfo {
     const durationCond = this.listDays().length === this.duration() + 1;
     const travellerCond = this.splits.every(
       (s) =>
-        this.travellers.every((t) => s.containsTraveller(t.id)) &&
+        Object.values(this.travellers).every((t) => s.containsTraveller(t.id)) &&
         s.travellers.length === this.travellers.length
     );
     return wellformedSplits && sequentialCond && durationCond && travellerCond;

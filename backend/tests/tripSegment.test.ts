@@ -64,19 +64,19 @@ describe("TripSegment Hotel Integration", () => {
   test("Add/Remove Traveller", () => {
     const testSegment = new TripSegment("t", "t", startdate, enddate);
     testSegment.addTraveller(myPerson1);
-    expect(testSegment.travellers).toContain(myPerson1);
+    expect(Object.values(testSegment.travellers)).toContain(myPerson1);
     expect(() => testSegment.addTraveller(myPerson1)).toThrow();
 
     expect(testSegment.removeTraveller(myPerson1.id)).toStrictEqual(myPerson1);
     expect(() => testSegment.removeTraveller(myPerson1.id)).toThrow();
-    expect(testSegment.travellers).toStrictEqual([]);
+    expect(testSegment.travellers).toStrictEqual({});
   });
 
   test("Add/Remove hotel", () => {
     const testSegment = new TripSegment("t", "t", startdate, enddate);
 
     testSegment.addHotel(myHotel);
-    expect(testSegment.hotels).toContain(myHotel);
+    expect(Object.values(testSegment.hotels)).toContain(myHotel);
     expect(() => testSegment.addHotel(myHotel)).toThrow();
 
     expect(testSegment.removeHotel(myHotel.id)).toStrictEqual(myHotel);
